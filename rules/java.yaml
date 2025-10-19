@@ -1,0 +1,1107 @@
+language: Java
+version: "1.0"
+description: "Java代码审计规则集"
+
+rules:
+  critical:
+    - name: "Runtime.exec命令执行"
+      function: "Runtime.getRuntime().exec("
+      description: "执行系统命令，可能存在命令注入风险"
+      regex: true
+      pattern: "Runtime\\.getRuntime\\(\\)\\.exec\\s*\\("
+      
+    - name: "ProcessBuilder命令执行"
+      function: "ProcessBuilder"
+      description: "构建并执行系统命令，可能存在命令注入风险"
+      regex: true
+      pattern: "new\\s+ProcessBuilder\\s*\\("
+      
+    - name: "ScriptEngine代码执行"
+      function: "ScriptEngine.eval("
+      description: "执行脚本代码，可能存在代码注入风险"
+      regex: true
+      pattern: "ScriptEngine.*\\.eval\\s*\\("
+      
+    - name: "反射调用Method.invoke"
+      function: "Method.invoke("
+      description: "反射调用方法，可能被利用执行任意代码"
+      regex: true
+      pattern: "Method.*\\.invoke\\s*\\("
+      
+    - name: "URLClassLoader动态加载"
+      function: "URLClassLoader"
+      description: "动态加载类，可能加载恶意类"
+      regex: true
+      pattern: "new\\s+URLClassLoader\\s*\\("
+      
+    - name: "defineClass动态定义类"
+      function: "defineClass("
+      description: "动态定义类，可能被利用加载恶意类"
+      regex: true
+      pattern: "defineClass\\s*\\("
+      
+    - name: "Class.forName动态加载类"
+      function: "Class.forName("
+      description: "动态加载类，可能加载恶意类"
+      regex: true
+      pattern: "Class\\.forName\\s*\\("
+      
+    - name: "ClassLoader.loadClass加载类"
+      function: "ClassLoader.loadClass("
+      description: "类加载器加载类，可能加载恶意类"
+      regex: true
+      pattern: "ClassLoader.*\\.loadClass\\s*\\("
+      
+    - name: "Unsafe反射获取"
+      function: "Unsafe"
+      description: "sun.misc.Unsafe类，可以绕过Java安全机制"
+      regex: true
+      pattern: "sun\\.misc\\.Unsafe"
+      
+    - name: "Constructor.newInstance反射创建"
+      function: "Constructor.newInstance("
+      description: "反射创建对象实例，可能被利用执行任意代码"
+      regex: true
+      pattern: "Constructor.*\\.newInstance\\s*\\("
+      
+    - name: "Class.newInstance反射创建"
+      function: "Class.newInstance("
+      description: "反射创建对象实例，可能被利用执行任意代码"
+      regex: true
+      pattern: "Class.*\\.newInstance\\s*\\("
+      
+    - name: "TemplatesImpl模板注入"
+      function: "TemplatesImpl"
+      description: "TemplatesImpl类，常用于Java反序列化漏洞利用"
+      regex: true
+      pattern: "TemplatesImpl"
+      
+    - name: "InvokerTransformer命令执行"
+      function: "InvokerTransformer"
+      description: "InvokerTransformer类，常用于反序列化攻击链"
+      regex: true
+      pattern: "InvokerTransformer"
+      
+    - name: "Groovy代码执行"
+      function: "GroovyShell.evaluate("
+      description: "Groovy脚本执行，可能存在代码注入风险"
+      regex: true
+      pattern: "GroovyShell.*\\.evaluate\\s*\\("
+      
+    - name: "JavaScript引擎执行"
+      function: "ScriptEngineManager.getEngineByName("
+      description: "获取脚本引擎，可能执行不安全代码"
+      regex: true
+      pattern: "ScriptEngineManager.*\\.getEngineByName\\s*\\("
+      
+    - name: "Expression.getValue SpEL执行"
+      function: "Expression.getValue("
+      description: "SpEL表达式求值，可能存在SpEL注入"
+      regex: true
+      pattern: "Expression.*\\.getValue\\s*\\("
+
+  high:
+    - name: "ObjectInputStream反序列化"
+      function: "ObjectInputStream.readObject("
+      description: "对象反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "ObjectInputStream.*\\.readObject\\s*\\("
+      
+    - name: "XMLDecoder反序列化"
+      function: "XMLDecoder.readObject("
+      description: "XML反序列化，可能存在XXE或反序列化漏洞"
+      regex: true
+      pattern: "XMLDecoder.*\\.readObject\\s*\\("
+      
+    - name: "XStream反序列化"
+      function: "XStream.fromXML("
+      description: "XStream反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "XStream.*\\.fromXML\\s*\\("
+      
+    - name: "Yaml.load反序列化"
+      function: "Yaml.load("
+      description: "YAML反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "Yaml.*\\.load\\s*\\("
+      
+    - name: "fastjson反序列化"
+      function: "JSON.parseObject("
+      description: "fastjson反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "JSON\\.parseObject\\s*\\("
+      
+    - name: "jackson反序列化"
+      function: "ObjectMapper.readValue("
+      description: "Jackson反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "ObjectMapper.*\\.readValue\\s*\\("
+      
+    - name: "SQL语句拼接"
+      function: "Statement.execute("
+      description: "直接执行SQL，可能存在SQL注入风险"
+      regex: true
+      pattern: "Statement.*\\.execute\\w*\\s*\\("
+      
+    - name: "JDBC查询"
+      function: "createStatement("
+      description: "创建Statement对象，注意SQL注入风险"
+      regex: true
+      pattern: "createStatement\\s*\\("
+      
+    - name: "动态SQL查询"
+      function: "createQuery("
+      description: "创建JPA查询，注意SQL注入风险"
+      regex: true
+      pattern: "createQuery\\s*\\("
+      
+    - name: "JNDI注入"
+      function: "InitialContext.lookup("
+      description: "JNDI查找，可能存在JNDI注入风险"
+      regex: true
+      pattern: "InitialContext.*\\.lookup\\s*\\("
+      
+    - name: "LDAP查询"
+      function: "search("
+      description: "LDAP查询，可能存在LDAP注入风险"
+      regex: true
+      pattern: "\\.search\\s*\\("
+      
+    - name: "XPath查询"
+      function: "XPath.compile("
+      description: "XPath查询，可能存在XPath注入风险"
+      regex: true
+      pattern: "XPath.*\\.compile\\s*\\("
+      
+    - name: "XXE漏洞"
+      function: "DocumentBuilderFactory"
+      description: "XML解析，可能存在XXE漏洞"
+      regex: true
+      pattern: "DocumentBuilderFactory"
+      
+    - name: "SpEL表达式注入"
+      function: "SpelExpressionParser"
+      description: "Spring表达式解析，可能存在SpEL注入"
+      regex: true
+      pattern: "SpelExpressionParser"
+      
+    - name: "OGNL表达式注入"
+      function: "Ognl.getValue("
+      description: "OGNL表达式解析，可能存在OGNL注入"
+      regex: true
+      pattern: "Ognl\\.getValue\\s*\\("
+      
+    - name: "Kryo反序列化"
+      function: "Kryo.readObject("
+      description: "Kryo反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "Kryo.*\\.readObject\\s*\\("
+      
+    - name: "Hessian反序列化"
+      function: "HessianInput.readObject("
+      description: "Hessian反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "HessianInput.*\\.readObject\\s*\\("
+      
+    - name: "Hessian2反序列化"
+      function: "Hessian2Input.readObject("
+      description: "Hessian2反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "Hessian2Input.*\\.readObject\\s*\\("
+      
+    - name: "Gson反序列化"
+      function: "Gson.fromJson("
+      description: "Gson反序列化，注意类型安全"
+      regex: true
+      pattern: "Gson.*\\.fromJson\\s*\\("
+      
+    - name: "SnakeYaml反序列化"
+      function: "Yaml.load("
+      description: "SnakeYaml反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "new\\s+Yaml\\s*\\(.*\\)\\.load\\s*\\("
+      
+    - name: "fastjson.parseArray反序列化"
+      function: "JSON.parseArray("
+      description: "fastjson数组反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "JSON\\.parseArray\\s*\\("
+      
+    - name: "fastjson.parse反序列化"
+      function: "JSON.parse("
+      description: "fastjson解析，可能存在反序列化漏洞"
+      regex: true
+      pattern: "JSON\\.parse\\s*\\("
+      
+    - name: "JSONObject.parseObject反序列化"
+      function: "JSONObject.parseObject("
+      description: "fastjson对象解析，可能存在反序列化漏洞"
+      regex: true
+      pattern: "JSONObject\\.parseObject\\s*\\("
+      
+    - name: "XMLDecoder.readObject反序列化"
+      function: "XMLDecoder.readObject("
+      description: "XMLDecoder反序列化，存在严重安全风险"
+      regex: true
+      pattern: "XMLDecoder.*\\.readObject\\s*\\("
+      
+    - name: "SAXReader.read XXE"
+      function: "SAXReader.read("
+      description: "SAX解析器读取XML，可能存在XXE漏洞"
+      regex: true
+      pattern: "SAXReader.*\\.read\\s*\\("
+      
+    - name: "SAXParserFactory XXE"
+      function: "SAXParserFactory"
+      description: "SAX解析器工厂，可能存在XXE漏洞"
+      regex: true
+      pattern: "SAXParserFactory"
+      
+    - name: "SAXBuilder.build XXE"
+      function: "SAXBuilder.build("
+      description: "SAX构建器，可能存在XXE漏洞"
+      regex: true
+      pattern: "SAXBuilder.*\\.build\\s*\\("
+      
+    - name: "Digester.parse XXE"
+      function: "Digester.parse("
+      description: "Digester解析，可能存在XXE漏洞"
+      regex: true
+      pattern: "Digester.*\\.parse\\s*\\("
+      
+    - name: "XPathExpression.evaluate XPath注入"
+      function: "XPathExpression.evaluate("
+      description: "XPath表达式求值，可能存在XPath注入"
+      regex: true
+      pattern: "XPathExpression.*\\.evaluate\\s*\\("
+      
+    - name: "XPath.evaluate XPath注入"
+      function: "XPath.evaluate("
+      description: "XPath求值，可能存在XPath注入"
+      regex: true
+      pattern: "XPath.*\\.evaluate\\s*\\("
+      
+    - name: "DirContext.search LDAP注入"
+      function: "DirContext.search("
+      description: "LDAP目录搜索，可能存在LDAP注入"
+      regex: true
+      pattern: "DirContext.*\\.search\\s*\\("
+      
+    - name: "LdapContext.search LDAP注入"
+      function: "LdapContext.search("
+      description: "LDAP上下文搜索，可能存在LDAP注入"
+      regex: true
+      pattern: "LdapContext.*\\.search\\s*\\("
+      
+    - name: "NamingEnumeration LDAP"
+      function: "NamingEnumeration"
+      description: "LDAP命名枚举，注意LDAP注入"
+      regex: true
+      pattern: "NamingEnumeration"
+      
+    - name: "PreparedStatement.executeQuery SQL"
+      function: "PreparedStatement.executeQuery("
+      description: "预编译SQL查询，注意参数化查询"
+      regex: true
+      pattern: "PreparedStatement.*\\.executeQuery\\s*\\("
+      
+    - name: "PreparedStatement.executeUpdate SQL"
+      function: "PreparedStatement.executeUpdate("
+      description: "预编译SQL更新，注意参数化查询"
+      regex: true
+      pattern: "PreparedStatement.*\\.executeUpdate\\s*\\("
+      
+    - name: "Statement.executeQuery SQL注入"
+      function: "Statement.executeQuery("
+      description: "SQL查询，可能存在SQL注入风险"
+      regex: true
+      pattern: "Statement.*\\.executeQuery\\s*\\("
+      
+    - name: "Statement.executeUpdate SQL注入"
+      function: "Statement.executeUpdate("
+      description: "SQL更新，可能存在SQL注入风险"
+      regex: true
+      pattern: "Statement.*\\.executeUpdate\\s*\\("
+      
+    - name: "createNativeQuery SQL注入"
+      function: "createNativeQuery("
+      description: "创建原生SQL查询，注意SQL注入风险"
+      regex: true
+      pattern: "createNativeQuery\\s*\\("
+      
+    - name: "EntityManager.createQuery HQL注入"
+      function: "EntityManager.createQuery("
+      description: "创建JPQL/HQL查询，注意注入风险"
+      regex: true
+      pattern: "EntityManager.*\\.createQuery\\s*\\("
+      
+    - name: "Session.createQuery HQL注入"
+      function: "Session.createQuery("
+      description: "Hibernate查询，注意HQL注入风险"
+      regex: true
+      pattern: "Session.*\\.createQuery\\s*\\("
+      
+    - name: "Session.createSQLQuery SQL注入"
+      function: "Session.createSQLQuery("
+      description: "Hibernate原生SQL，注意SQL注入风险"
+      regex: true
+      pattern: "Session.*\\.createSQLQuery\\s*\\("
+      
+    - name: "MongoDatabase.runCommand NoSQL注入"
+      function: "MongoDatabase.runCommand("
+      description: "MongoDB命令执行，注意NoSQL注入"
+      regex: true
+      pattern: "MongoDatabase.*\\.runCommand\\s*\\("
+      
+    - name: "MongoCollection.find NoSQL注入"
+      function: "MongoCollection.find("
+      description: "MongoDB查询，注意NoSQL注入"
+      regex: true
+      pattern: "MongoCollection.*\\.find\\s*\\("
+      
+    - name: "RedisTemplate.execute命令执行"
+      function: "RedisTemplate.execute("
+      description: "Redis命令执行，注意命令注入"
+      regex: true
+      pattern: "RedisTemplate.*\\.execute\\s*\\("
+
+  medium:
+    - name: "文件上传"
+      function: "MultipartFile.transferTo("
+      description: "文件上传，注意文件类型和路径验证"
+      regex: true
+      pattern: "MultipartFile.*\\.transferTo\\s*\\("
+      
+    - name: "文件读取FileInputStream"
+      function: "FileInputStream"
+      description: "文件输入流，注意路径验证防止路径遍历"
+      regex: true
+      pattern: "new\\s+FileInputStream\\s*\\("
+      
+    - name: "文件写入FileOutputStream"
+      function: "FileOutputStream"
+      description: "文件输出流，注意路径验证"
+      regex: true
+      pattern: "new\\s+FileOutputStream\\s*\\("
+      
+    - name: "文件操作Files.write"
+      function: "Files.write("
+      description: "文件写入，注意路径验证"
+      regex: true
+      pattern: "Files\\.write\\s*\\("
+      
+    - name: "文件操作Files.copy"
+      function: "Files.copy("
+      description: "文件复制，注意路径验证"
+      regex: true
+      pattern: "Files\\.copy\\s*\\("
+      
+    - name: "重定向sendRedirect"
+      function: "sendRedirect("
+      description: "HTTP重定向，可能存在开放重定向漏洞"
+      regex: true
+      pattern: "sendRedirect\\s*\\("
+      
+    - name: "转发forward"
+      function: "forward("
+      description: "请求转发，注意路径验证"
+      regex: true
+      pattern: "\\.forward\\s*\\("
+      
+    - name: "Cookie操作"
+      function: "Cookie"
+      description: "Cookie操作，注意HttpOnly和Secure标志"
+      regex: true
+      pattern: "new\\s+Cookie\\s*\\("
+      
+    - name: "Session操作"
+      function: "getSession("
+      description: "Session操作，注意Session固定攻击"
+      regex: true
+      pattern: "getSession\\s*\\("
+      
+    - name: "URL连接"
+      function: "URL.openConnection("
+      description: "URL连接，注意SSRF风险"
+      regex: true
+      pattern: "URL.*\\.openConnection\\s*\\("
+      
+    - name: "HttpClient请求"
+      function: "HttpClient.execute("
+      description: "HTTP请求，注意SSRF风险"
+      regex: true
+      pattern: "HttpClient.*\\.execute\\s*\\("
+      
+    - name: "随机数生成Random"
+      function: "new Random("
+      description: "使用Random生成随机数，不适合加密场景"
+      regex: true
+      pattern: "new\\s+Random\\s*\\("
+      
+    - name: "MD5哈希"
+      function: 'MessageDigest.getInstance("MD5")'
+      description: "MD5算法不安全，不应用于密码哈希"
+      regex: true
+      pattern: 'MessageDigest\\.getInstance\\s*\\(\\s*"MD5"'
+      
+    - name: "SHA1哈希"
+      function: 'MessageDigest.getInstance("SHA-1")'
+      description: "SHA-1算法不安全，不应用于密码哈希"
+      regex: true
+      pattern: 'MessageDigest\\.getInstance\\s*\\(\\s*"SHA-1"'
+      
+    - name: "Files.read文件读取"
+      function: "Files.readAllBytes("
+      description: "读取文件所有字节，注意路径验证"
+      regex: true
+      pattern: "Files\\.readAllBytes\\s*\\("
+      
+    - name: "Files.readAllLines文件读取"
+      function: "Files.readAllLines("
+      description: "读取文件所有行，注意路径验证"
+      regex: true
+      pattern: "Files\\.readAllLines\\s*\\("
+      
+    - name: "Files.readString文件读取"
+      function: "Files.readString("
+      description: "读取文件为字符串，注意路径验证"
+      regex: true
+      pattern: "Files\\.readString\\s*\\("
+      
+    - name: "Files.move文件移动"
+      function: "Files.move("
+      description: "移动文件，注意路径验证"
+      regex: true
+      pattern: "Files\\.move\\s*\\("
+      
+    - name: "Files.delete文件删除"
+      function: "Files.delete("
+      description: "删除文件，注意路径验证"
+      regex: true
+      pattern: "Files\\.delete\\s*\\("
+      
+    - name: "Files.deleteIfExists文件删除"
+      function: "Files.deleteIfExists("
+      description: "删除文件（如果存在），注意路径验证"
+      regex: true
+      pattern: "Files\\.deleteIfExists\\s*\\("
+      
+    - name: "Files.createFile文件创建"
+      function: "Files.createFile("
+      description: "创建文件，注意路径验证"
+      regex: true
+      pattern: "Files\\.createFile\\s*\\("
+      
+    - name: "Files.createDirectory目录创建"
+      function: "Files.createDirectory("
+      description: "创建目录，注意路径验证"
+      regex: true
+      pattern: "Files\\.createDirectory\\s*\\("
+      
+    - name: "Files.createDirectories目录创建"
+      function: "Files.createDirectories("
+      description: "创建目录（包括父目录），注意路径验证"
+      regex: true
+      pattern: "Files\\.createDirectories\\s*\\("
+      
+    - name: "Files.walk目录遍历"
+      function: "Files.walk("
+      description: "遍历目录树，可能存在目录遍历风险"
+      regex: true
+      pattern: "Files\\.walk\\s*\\("
+      
+    - name: "Files.list目录列表"
+      function: "Files.list("
+      description: "列出目录内容，可能存在目录遍历风险"
+      regex: true
+      pattern: "Files\\.list\\s*\\("
+      
+    - name: "File.delete文件删除"
+      function: "File.delete("
+      description: "删除文件，注意路径验证"
+      regex: true
+      pattern: "File.*\\.delete\\s*\\("
+      
+    - name: "File.renameTo文件重命名"
+      function: "File.renameTo("
+      description: "重命名/移动文件，注意路径验证"
+      regex: true
+      pattern: "File.*\\.renameTo\\s*\\("
+      
+    - name: "File.listFiles目录遍历"
+      function: "File.listFiles("
+      description: "列出目录文件，可能存在目录遍历风险"
+      regex: true
+      pattern: "File.*\\.listFiles\\s*\\("
+      
+    - name: "FileReader文件读取"
+      function: "FileReader"
+      description: "文件字符流读取，注意路径验证"
+      regex: true
+      pattern: "new\\s+FileReader\\s*\\("
+      
+    - name: "FileWriter文件写入"
+      function: "FileWriter"
+      description: "文件字符流写入，注意路径验证"
+      regex: true
+      pattern: "new\\s+FileWriter\\s*\\("
+      
+    - name: "BufferedReader文件读取"
+      function: "BufferedReader"
+      description: "缓冲字符流读取"
+      regex: true
+      pattern: "new\\s+BufferedReader\\s*\\("
+      
+    - name: "BufferedWriter文件写入"
+      function: "BufferedWriter"
+      description: "缓冲字符流写入"
+      regex: true
+      pattern: "new\\s+BufferedWriter\\s*\\("
+      
+    - name: "RandomAccessFile文件操作"
+      function: "RandomAccessFile"
+      description: "随机访问文件，注意路径验证"
+      regex: true
+      pattern: "new\\s+RandomAccessFile\\s*\\("
+      
+    - name: "ZipInputStream ZIP解压"
+      function: "ZipInputStream"
+      description: "ZIP输入流，注意Zip Slip漏洞"
+      regex: true
+      pattern: "new\\s+ZipInputStream\\s*\\("
+      
+    - name: "ZipFile ZIP文件"
+      function: "ZipFile"
+      description: "ZIP文件操作，注意Zip Slip漏洞"
+      regex: true
+      pattern: "new\\s+ZipFile\\s*\\("
+      
+    - name: "TarArchiveInputStream TAR解压"
+      function: "TarArchiveInputStream"
+      description: "TAR输入流，注意路径遍历"
+      regex: true
+      pattern: "new\\s+TarArchiveInputStream\\s*\\("
+      
+    - name: "getParameter请求参数"
+      function: "getParameter("
+      description: "获取请求参数，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "getParameter\\s*\\("
+      
+    - name: "getParameterValues请求参数"
+      function: "getParameterValues("
+      description: "获取多值请求参数，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "getParameterValues\\s*\\("
+      
+    - name: "getHeader请求头"
+      function: "getHeader("
+      description: "获取HTTP请求头，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "getHeader\\s*\\("
+      
+    - name: "getCookies Cookie"
+      function: "getCookies("
+      description: "获取Cookie数组，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "getCookies\\s*\\("
+      
+    - name: "getQueryString查询字符串"
+      function: "getQueryString("
+      description: "获取查询字符串，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "getQueryString\\s*\\("
+      
+    - name: "getRequestURI请求URI"
+      function: "getRequestURI("
+      description: "获取请求URI，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "getRequestURI\\s*\\("
+      
+    - name: "getInputStream请求流"
+      function: "getInputStream("
+      description: "获取请求输入流，注意数据验证"
+      regex: true
+      pattern: "getInputStream\\s*\\("
+      
+    - name: "getReader请求读取器"
+      function: "getReader("
+      description: "获取请求读取器，注意数据验证"
+      regex: true
+      pattern: "getReader\\s*\\("
+      
+    - name: "response.getWriter响应输出"
+      function: "getWriter("
+      description: "获取响应输出流，可能存在XSS风险"
+      regex: true
+      pattern: "getWriter\\s*\\("
+      
+    - name: "response.getOutputStream响应输出"
+      function: "getOutputStream("
+      description: "获取响应输出流"
+      regex: true
+      pattern: "getOutputStream\\s*\\("
+      
+    - name: "setAttribute属性设置"
+      function: "setAttribute("
+      description: "设置属性，注意数据验证"
+      regex: true
+      pattern: "setAttribute\\s*\\("
+      
+    - name: "getAttribute属性获取"
+      function: "getAttribute("
+      description: "获取属性"
+      regex: true
+      pattern: "getAttribute\\s*\\("
+      
+    - name: "RequestDispatcher.include包含"
+      function: "RequestDispatcher.include("
+      description: "包含资源，注意路径验证"
+      regex: true
+      pattern: "RequestDispatcher.*\\.include\\s*\\("
+      
+    - name: "URLConnection.connect URL连接"
+      function: "URLConnection.connect("
+      description: "URL连接，注意SSRF风险"
+      regex: true
+      pattern: "URLConnection.*\\.connect\\s*\\("
+      
+    - name: "URL.openStream URL读取"
+      function: "URL.openStream("
+      description: "打开URL流，注意SSRF风险"
+      regex: true
+      pattern: "URL.*\\.openStream\\s*\\("
+      
+    - name: "HttpURLConnection HTTP连接"
+      function: "HttpURLConnection"
+      description: "HTTP URL连接，注意SSRF风险"
+      regex: true
+      pattern: "HttpURLConnection"
+      
+    - name: "OkHttpClient.newCall HTTP请求"
+      function: "OkHttpClient.newCall("
+      description: "OkHttp请求，注意SSRF风险"
+      regex: true
+      pattern: "OkHttpClient.*\\.newCall\\s*\\("
+      
+    - name: "RestTemplate.getForObject HTTP请求"
+      function: "RestTemplate.getForObject("
+      description: "RestTemplate GET请求，注意SSRF风险"
+      regex: true
+      pattern: "RestTemplate.*\\.getForObject\\s*\\("
+      
+    - name: "RestTemplate.postForObject HTTP请求"
+      function: "RestTemplate.postForObject("
+      description: "RestTemplate POST请求，注意SSRF风险"
+      regex: true
+      pattern: "RestTemplate.*\\.postForObject\\s*\\("
+      
+    - name: "RestTemplate.exchange HTTP请求"
+      function: "RestTemplate.exchange("
+      description: "RestTemplate请求交换，注意SSRF风险"
+      regex: true
+      pattern: "RestTemplate.*\\.exchange\\s*\\("
+      
+    - name: "Socket套接字"
+      function: "Socket"
+      description: "Socket连接，注意网络安全"
+      regex: true
+      pattern: "new\\s+Socket\\s*\\("
+      
+    - name: "ServerSocket服务器套接字"
+      function: "ServerSocket"
+      description: "服务器Socket，注意端口安全"
+      regex: true
+      pattern: "new\\s+ServerSocket\\s*\\("
+      
+    - name: "DatagramSocket数据报套接字"
+      function: "DatagramSocket"
+      description: "UDP套接字"
+      regex: true
+      pattern: "new\\s+DatagramSocket\\s*\\("
+      
+    - name: "Cipher加密"
+      function: "Cipher.getInstance("
+      description: "获取加密实例，注意使用安全的算法和模式"
+      regex: true
+      pattern: "Cipher\\.getInstance\\s*\\("
+      
+    - name: "SecretKeySpec密钥规范"
+      function: "SecretKeySpec"
+      description: "密钥规范，注意密钥安全"
+      regex: true
+      pattern: "new\\s+SecretKeySpec\\s*\\("
+      
+    - name: "KeyGenerator密钥生成"
+      function: "KeyGenerator.getInstance("
+      description: "密钥生成器，注意算法选择"
+      regex: true
+      pattern: "KeyGenerator\\.getInstance\\s*\\("
+      
+    - name: "KeyPairGenerator密钥对生成"
+      function: "KeyPairGenerator.getInstance("
+      description: "密钥对生成器，注意密钥长度"
+      regex: true
+      pattern: "KeyPairGenerator\\.getInstance\\s*\\("
+      
+    - name: "SecureRandom安全随机"
+      function: "SecureRandom"
+      description: "安全随机数生成器"
+      regex: true
+      pattern: "new\\s+SecureRandom\\s*\\("
+      
+    - name: "IvParameterSpec初始向量"
+      function: "IvParameterSpec"
+      description: "初始化向量参数，注意IV的随机性"
+      regex: true
+      pattern: "new\\s+IvParameterSpec\\s*\\("
+      
+    - name: "JavaMailSender邮件发送"
+      function: "JavaMailSender.send("
+      description: "发送邮件，注意邮件头注入"
+      regex: true
+      pattern: "JavaMailSender.*\\.send\\s*\\("
+      
+    - name: "MimeMessage邮件消息"
+      function: "MimeMessage"
+      description: "MIME邮件消息，注意邮件头注入"
+      regex: true
+      pattern: "new\\s+MimeMessage\\s*\\("
+
+  low:
+    - name: "printStackTrace调试输出"
+      function: "printStackTrace("
+      description: "打印异常堆栈，生产环境应使用日志"
+      regex: true
+      pattern: "printStackTrace\\s*\\("
+      
+    - name: "System.out调试输出"
+      function: "System.out.println("
+      description: "控制台输出，生产环境应使用日志框架"
+      regex: true
+      pattern: "System\\.out\\.print"
+      
+    - name: "System.err调试输出"
+      function: "System.err.println("
+      description: "错误输出，生产环境应使用日志框架"
+      regex: true
+      pattern: "System\\.err\\.print"
+      
+    - name: "Thread.sleep线程睡眠"
+      function: "Thread.sleep("
+      description: "线程睡眠，可能影响性能"
+      regex: true
+      pattern: "Thread\\.sleep\\s*\\("
+      
+    - name: "Runtime.gc垃圾回收"
+      function: "Runtime.gc("
+      description: "强制垃圾回收，通常不建议手动调用"
+      regex: true
+      pattern: "Runtime\\.gc\\s*\\("
+      
+    - name: "System.gc垃圾回收"
+      function: "System.gc("
+      description: "强制垃圾回收，通常不建议手动调用"
+      regex: true
+      pattern: "System\\.gc\\s*\\("
+      
+    - name: "Logger.info日志信息"
+      function: "logger.info("
+      description: "日志信息输出，注意敏感信息"
+      regex: true
+      pattern: "logger\\.info\\s*\\("
+      
+    - name: "Logger.debug日志调试"
+      function: "logger.debug("
+      description: "调试日志输出，注意敏感信息"
+      regex: true
+      pattern: "logger\\.debug\\s*\\("
+      
+    - name: "Logger.error日志错误"
+      function: "logger.error("
+      description: "错误日志输出，注意敏感信息"
+      regex: true
+      pattern: "logger\\.error\\s*\\("
+      
+    - name: "Logger.warn日志警告"
+      function: "logger.warn("
+      description: "警告日志输出"
+      regex: true
+      pattern: "logger\\.warn\\s*\\("
+      
+    - name: "log.info日志信息"
+      function: "log.info("
+      description: "日志信息输出，注意敏感信息"
+      regex: true
+      pattern: "log\\.info\\s*\\("
+      
+    - name: "log.debug日志调试"
+      function: "log.debug("
+      description: "调试日志输出，注意敏感信息"
+      regex: true
+      pattern: "log\\.debug\\s*\\("
+      
+    - name: "log.error日志错误"
+      function: "log.error("
+      description: "错误日志输出，注意敏感信息"
+      regex: true
+      pattern: "log\\.error\\s*\\("
+      
+    - name: "System.getProperty系统属性"
+      function: "System.getProperty("
+      description: "获取系统属性，可能泄露系统信息"
+      regex: true
+      pattern: "System\\.getProperty\\s*\\("
+      
+    - name: "System.getProperties系统属性"
+      function: "System.getProperties("
+      description: "获取所有系统属性，可能泄露系统信息"
+      regex: true
+      pattern: "System\\.getProperties\\s*\\("
+      
+    - name: "System.setProperty系统属性"
+      function: "System.setProperty("
+      description: "设置系统属性"
+      regex: true
+      pattern: "System\\.setProperty\\s*\\("
+      
+    - name: "System.getenv环境变量"
+      function: "System.getenv("
+      description: "获取环境变量，可能泄露敏感信息"
+      regex: true
+      pattern: "System\\.getenv\\s*\\("
+      
+    - name: "Runtime.getRuntime运行时"
+      function: "Runtime.getRuntime("
+      description: "获取运行时实例"
+      regex: true
+      pattern: "Runtime\\.getRuntime\\s*\\("
+      
+    - name: "Runtime.availableProcessors处理器数"
+      function: "Runtime.availableProcessors("
+      description: "获取可用处理器数量，可能泄露系统信息"
+      regex: true
+      pattern: "Runtime.*\\.availableProcessors\\s*\\("
+      
+    - name: "Runtime.totalMemory内存信息"
+      function: "Runtime.totalMemory("
+      description: "获取总内存，可能泄露系统信息"
+      regex: true
+      pattern: "Runtime.*\\.totalMemory\\s*\\("
+      
+    - name: "Runtime.freeMemory内存信息"
+      function: "Runtime.freeMemory("
+      description: "获取空闲内存，可能泄露系统信息"
+      regex: true
+      pattern: "Runtime.*\\.freeMemory\\s*\\("
+      
+    - name: "InetAddress.getLocalHost主机信息"
+      function: "InetAddress.getLocalHost("
+      description: "获取本地主机信息，可能泄露主机信息"
+      regex: true
+      pattern: "InetAddress\\.getLocalHost\\s*\\("
+      
+    - name: "InetAddress.getHostName主机名"
+      function: "InetAddress.getHostName("
+      description: "获取主机名，可能泄露主机信息"
+      regex: true
+      pattern: "InetAddress.*\\.getHostName\\s*\\("
+      
+    - name: "InetAddress.getHostAddress主机地址"
+      function: "InetAddress.getHostAddress("
+      description: "获取主机地址，可能泄露主机信息"
+      regex: true
+      pattern: "InetAddress.*\\.getHostAddress\\s*\\("
+      
+    - name: "NetworkInterface.getNetworkInterfaces网络接口"
+      function: "NetworkInterface.getNetworkInterfaces("
+      description: "获取网络接口，可能泄露网络信息"
+      regex: true
+      pattern: "NetworkInterface\\.getNetworkInterfaces\\s*\\("
+      
+    - name: "ManagementFactory.getRuntimeMXBean运行时信息"
+      function: "ManagementFactory.getRuntimeMXBean("
+      description: "获取运行时MXBean，可能泄露系统信息"
+      regex: true
+      pattern: "ManagementFactory\\.getRuntimeMXBean\\s*\\("
+      
+    - name: "ManagementFactory.getOperatingSystemMXBean系统信息"
+      function: "ManagementFactory.getOperatingSystemMXBean("
+      description: "获取操作系统MXBean，可能泄露系统信息"
+      regex: true
+      pattern: "ManagementFactory\\.getOperatingSystemMXBean\\s*\\("
+      
+    - name: "Class.getClassLoader类加载器"
+      function: "Class.getClassLoader("
+      description: "获取类加载器"
+      regex: true
+      pattern: "Class.*\\.getClassLoader\\s*\\("
+      
+    - name: "Thread.currentThread当前线程"
+      function: "Thread.currentThread("
+      description: "获取当前线程"
+      regex: true
+      pattern: "Thread\\.currentThread\\s*\\("
+      
+    - name: "Thread.getStackTrace堆栈跟踪"
+      function: "Thread.getStackTrace("
+      description: "获取线程堆栈跟踪，可能泄露路径信息"
+      regex: true
+      pattern: "Thread.*\\.getStackTrace\\s*\\("
+      
+    - name: "Exception.getMessage异常消息"
+      function: "Exception.getMessage("
+      description: "获取异常消息，可能泄露敏感信息"
+      regex: true
+      pattern: "Exception.*\\.getMessage\\s*\\("
+      
+    - name: "Throwable.getStackTrace异常堆栈"
+      function: "Throwable.getStackTrace("
+      description: "获取异常堆栈，可能泄露路径信息"
+      regex: true
+      pattern: "Throwable.*\\.getStackTrace\\s*\\("
+      
+    - name: "getClass反射获取类"
+      function: "getClass("
+      description: "获取对象类"
+      regex: true
+      pattern: "getClass\\s*\\("
+      
+    - name: "Class.getDeclaredFields反射字段"
+      function: "Class.getDeclaredFields("
+      description: "获取声明的字段"
+      regex: true
+      pattern: "Class.*\\.getDeclaredFields\\s*\\("
+      
+    - name: "Class.getDeclaredMethods反射方法"
+      function: "Class.getDeclaredMethods("
+      description: "获取声明的方法"
+      regex: true
+      pattern: "Class.*\\.getDeclaredMethods\\s*\\("
+      
+    - name: "Field.setAccessible反射访问"
+      function: "Field.setAccessible("
+      description: "设置字段可访问，绕过访问控制"
+      regex: true
+      pattern: "Field.*\\.setAccessible\\s*\\("
+      
+    - name: "Method.setAccessible反射访问"
+      function: "Method.setAccessible("
+      description: "设置方法可访问，绕过访问控制"
+      regex: true
+      pattern: "Method.*\\.setAccessible\\s*\\("
+      
+    - name: "Constructor.setAccessible反射访问"
+      function: "Constructor.setAccessible("
+      description: "设置构造器可访问，绕过访问控制"
+      regex: true
+      pattern: "Constructor.*\\.setAccessible\\s*\\("
+      
+    - name: "AccessibleObject.setAccessible反射访问"
+      function: "AccessibleObject.setAccessible("
+      description: "设置可访问，绕过访问控制"
+      regex: true
+      pattern: "AccessibleObject.*\\.setAccessible\\s*\\("
+      
+    - name: "System.exit系统退出"
+      function: "System.exit("
+      description: "退出JVM，谨慎使用"
+      regex: true
+      pattern: "System\\.exit\\s*\\("
+      
+    - name: "Runtime.halt运行时停止"
+      function: "Runtime.halt("
+      description: "强制停止JVM，非常危险"
+      regex: true
+      pattern: "Runtime.*\\.halt\\s*\\("
+      
+    - name: "Runtime.addShutdownHook关闭钩子"
+      function: "Runtime.addShutdownHook("
+      description: "添加JVM关闭钩子"
+      regex: true
+      pattern: "Runtime.*\\.addShutdownHook\\s*\\("
+      
+    - name: "Thread.stop线程停止"
+      function: "Thread.stop("
+      description: "停止线程（已废弃），不安全"
+      regex: true
+      pattern: "Thread.*\\.stop\\s*\\("
+      
+    - name: "Thread.suspend线程挂起"
+      function: "Thread.suspend("
+      description: "挂起线程（已废弃），可能导致死锁"
+      regex: true
+      pattern: "Thread.*\\.suspend\\s*\\("
+      
+    - name: "Thread.resume线程恢复"
+      function: "Thread.resume("
+      description: "恢复线程（已废弃）"
+      regex: true
+      pattern: "Thread.*\\.resume\\s*\\("
+      
+    - name: "File.exists文件检查"
+      function: "File.exists("
+      description: "检查文件是否存在"
+      regex: true
+      pattern: "File.*\\.exists\\s*\\("
+      
+    - name: "File.isFile文件判断"
+      function: "File.isFile("
+      description: "判断是否为文件"
+      regex: true
+      pattern: "File.*\\.isFile\\s*\\("
+      
+    - name: "File.isDirectory目录判断"
+      function: "File.isDirectory("
+      description: "判断是否为目录"
+      regex: true
+      pattern: "File.*\\.isDirectory\\s*\\("
+      
+    - name: "File.canRead权限检查"
+      function: "File.canRead("
+      description: "检查是否可读"
+      regex: true
+      pattern: "File.*\\.canRead\\s*\\("
+      
+    - name: "File.canWrite权限检查"
+      function: "File.canWrite("
+      description: "检查是否可写"
+      regex: true
+      pattern: "File.*\\.canWrite\\s*\\("
+      
+    - name: "File.canExecute权限检查"
+      function: "File.canExecute("
+      description: "检查是否可执行"
+      regex: true
+      pattern: "File.*\\.canExecute\\s*\\("
+      
+    - name: "File.getAbsolutePath绝对路径"
+      function: "File.getAbsolutePath("
+      description: "获取绝对路径，可能泄露路径信息"
+      regex: true
+      pattern: "File.*\\.getAbsolutePath\\s*\\("
+      
+    - name: "File.getCanonicalPath规范路径"
+      function: "File.getCanonicalPath("
+      description: "获取规范路径，可能泄露路径信息"
+      regex: true
+      pattern: "File.*\\.getCanonicalPath\\s*\\("
+      
+    - name: "Paths.get路径获取"
+      function: "Paths.get("
+      description: "获取路径对象"
+      regex: true
+      pattern: "Paths\\.get\\s*\\("
+      
+    - name: "Path.toAbsolutePath绝对路径"
+      function: "Path.toAbsolutePath("
+      description: "转换为绝对路径"
+      regex: true
+      pattern: "Path.*\\.toAbsolutePath\\s*\\("
+      
+    - name: "Path.normalize路径规范化"
+      function: "Path.normalize("
+      description: "规范化路径"
+      regex: true
+      pattern: "Path.*\\.normalize\\s*\\("
+

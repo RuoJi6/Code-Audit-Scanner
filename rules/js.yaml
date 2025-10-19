@@ -1,0 +1,1203 @@
+language: JavaScript
+version: "1.0"
+description: "JavaScript/Node.js代码审计规则集"
+
+rules:
+  critical:
+    - name: "eval函数"
+      function: "eval("
+      description: "执行JavaScript代码，可能存在代码注入风险"
+      regex: true
+      pattern: "eval\\s*\\("
+      
+    - name: "Function构造函数"
+      function: "new Function("
+      description: "动态创建函数，可能存在代码注入风险"
+      regex: true
+      pattern: "new\\s+Function\\s*\\("
+      
+    - name: "setTimeout字符串参数"
+      function: "setTimeout("
+      description: "setTimeout使用字符串参数可能存在代码注入风险"
+      regex: true
+      pattern: "setTimeout\\s*\\(\\s*['\"]"
+      
+    - name: "setInterval字符串参数"
+      function: "setInterval("
+      description: "setInterval使用字符串参数可能存在代码注入风险"
+      regex: true
+      pattern: "setInterval\\s*\\(\\s*['\"]"
+      
+    - name: "child_process.exec命令执行"
+      function: "child_process.exec("
+      description: "执行系统命令，可能存在命令注入风险"
+      regex: true
+      pattern: "child_process\\.exec\\s*\\("
+      
+    - name: "exec命令执行"
+      function: "exec("
+      description: "执行系统命令，可能存在命令注入风险"
+      regex: true
+      pattern: "exec\\s*\\("
+      
+    - name: "child_process.spawn命令执行"
+      function: "child_process.spawn("
+      description: "生成子进程执行命令，注意命令注入风险"
+      regex: true
+      pattern: "child_process\\.spawn\\s*\\("
+      
+    - name: "vm.runInNewContext代码执行"
+      function: "vm.runInNewContext("
+      description: "在新上下文中运行代码，可能存在沙箱逃逸风险"
+      regex: true
+      pattern: "vm\\.runInNewContext\\s*\\("
+      
+    - name: "vm.runInThisContext代码执行"
+      function: "vm.runInThisContext("
+      description: "在当前上下文中运行代码，可能存在代码注入风险"
+      regex: true
+      pattern: "vm\\.runInThisContext\\s*\\("
+      
+    - name: "require动态加载"
+      function: "require("
+      description: "动态加载模块，如果路径来自用户输入可能存在风险"
+      regex: true
+      pattern: "require\\s*\\(\\s*\\$"
+      
+    - name: "child_process.execSync命令执行"
+      function: "child_process.execSync("
+      description: "同步执行系统命令，存在命令注入风险"
+      regex: true
+      pattern: "child_process\\.execSync\\s*\\("
+      
+    - name: "execSync命令执行"
+      function: "execSync("
+      description: "同步执行系统命令，存在命令注入风险"
+      regex: true
+      pattern: "execSync\\s*\\("
+      
+    - name: "child_process.execFile命令执行"
+      function: "child_process.execFile("
+      description: "执行文件，可能存在命令注入风险"
+      regex: true
+      pattern: "child_process\\.execFile\\s*\\("
+      
+    - name: "child_process.fork进程创建"
+      function: "child_process.fork("
+      description: "创建子进程，注意脚本路径来源"
+      regex: true
+      pattern: "child_process\\.fork\\s*\\("
+      
+    - name: "child_process.spawnSync命令执行"
+      function: "child_process.spawnSync("
+      description: "同步生成子进程，注意命令注入"
+      regex: true
+      pattern: "child_process\\.spawnSync\\s*\\("
+      
+    - name: "vm.Script代码执行"
+      function: "vm.Script("
+      description: "创建脚本对象，可能存在代码注入风险"
+      regex: true
+      pattern: "new\\s+vm\\.Script\\s*\\("
+      
+    - name: "vm.compileFunction代码编译"
+      function: "vm.compileFunction("
+      description: "编译函数，可能存在代码注入风险"
+      regex: true
+      pattern: "vm\\.compileFunction\\s*\\("
+      
+    - name: "vm.runInContext代码执行"
+      function: "vm.runInContext("
+      description: "在指定上下文中运行代码，可能存在沙箱逃逸"
+      regex: true
+      pattern: "vm\\.runInContext\\s*\\("
+      
+    - name: "Worker线程代码执行"
+      function: "Worker("
+      description: "Web Worker，注意脚本来源"
+      regex: true
+      pattern: "new\\s+Worker\\s*\\("
+      
+    - name: "importScripts脚本导入"
+      function: "importScripts("
+      description: "Worker中导入脚本，注意脚本来源"
+      regex: true
+      pattern: "importScripts\\s*\\("
+      
+    - name: "require.main.require动态加载"
+      function: "require.main.require("
+      description: "主模块require，注意模块路径来源"
+      regex: true
+      pattern: "require\\.main\\.require\\s*\\("
+
+  high:
+    - name: "innerHTML DOM操作"
+      function: "innerHTML"
+      description: "直接设置HTML，可能存在XSS风险"
+      regex: true
+      pattern: "innerHTML\\s*="
+      
+    - name: "outerHTML DOM操作"
+      function: "outerHTML"
+      description: "直接设置外部HTML，可能存在XSS风险"
+      regex: true
+      pattern: "outerHTML\\s*="
+      
+    - name: "document.write输出"
+      function: "document.write("
+      description: "直接写入文档，可能存在XSS风险"
+      regex: true
+      pattern: "document\\.write\\s*\\("
+      
+    - name: "document.writeln输出"
+      function: "document.writeln("
+      description: "直接写入文档并换行，可能存在XSS风险"
+      regex: true
+      pattern: "document\\.writeln\\s*\\("
+      
+    - name: "dangerouslySetInnerHTML React"
+      function: "dangerouslySetInnerHTML"
+      description: "React中直接设置HTML，可能存在XSS风险"
+      regex: true
+      pattern: "dangerouslySetInnerHTML"
+      
+    - name: "jQuery html方法"
+      function: ".html("
+      description: "jQuery设置HTML内容，可能存在XSS风险"
+      regex: true
+      pattern: "\\.html\\s*\\("
+      
+    - name: "jQuery append方法"
+      function: ".append("
+      description: "jQuery追加HTML内容，可能存在XSS风险"
+      regex: true
+      pattern: "\\.append\\s*\\("
+      
+    - name: "location.href跳转"
+      function: "location.href"
+      description: "URL跳转，可能存在开放重定向或XSS风险"
+      regex: true
+      pattern: "location\\.href\\s*="
+      
+    - name: "window.location跳转"
+      function: "window.location"
+      description: "URL跳转，可能存在开放重定向或XSS风险"
+      regex: true
+      pattern: "window\\.location\\s*="
+      
+    - name: "SQL查询拼接"
+      function: "query("
+      description: "数据库查询，字符串拼接可能存在SQL注入风险"
+      regex: true
+      pattern: "\\.query\\s*\\("
+      
+    - name: "MongoDB查询"
+      function: "find("
+      description: "MongoDB查询，不当使用可能存在NoSQL注入"
+      regex: true
+      pattern: "\\.find\\s*\\("
+      
+    - name: "MongoDB $where查询"
+      function: "$where"
+      description: "MongoDB $where查询，可能存在代码注入风险"
+      regex: true
+      pattern: "\\$where"
+      
+    - name: "XMLHttpRequest请求"
+      function: "XMLHttpRequest"
+      description: "AJAX请求，注意SSRF和CORS问题"
+      regex: true
+      pattern: "new\\s+XMLHttpRequest\\s*\\("
+      
+    - name: "fetch请求"
+      function: "fetch("
+      description: "Fetch API请求，注意SSRF风险"
+      regex: true
+      pattern: "fetch\\s*\\("
+      
+    - name: "axios请求"
+      function: "axios"
+      description: "axios HTTP请求，注意SSRF风险"
+      regex: true
+      pattern: "axios\\."
+      
+    - name: "node-serialize反序列化"
+      function: "serialize.unserialize("
+      description: "Node反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "serialize\\.unserialize\\s*\\("
+      
+    - name: "JSON.parse解析"
+      function: "JSON.parse("
+      description: "JSON解析，注意原型污染风险"
+      regex: true
+      pattern: "JSON\\.parse\\s*\\("
+      
+    - name: "insertAdjacentHTML HTML插入"
+      function: "insertAdjacentHTML("
+      description: "插入HTML，可能存在XSS风险"
+      regex: true
+      pattern: "insertAdjacentHTML\\s*\\("
+      
+    - name: "jQuery after方法"
+      function: ".after("
+      description: "jQuery在元素后插入内容，可能存在XSS风险"
+      regex: true
+      pattern: "\\.after\\s*\\("
+      
+    - name: "jQuery before方法"
+      function: ".before("
+      description: "jQuery在元素前插入内容，可能存在XSS风险"
+      regex: true
+      pattern: "\\.before\\s*\\("
+      
+    - name: "jQuery prepend方法"
+      function: ".prepend("
+      description: "jQuery前置插入内容，可能存在XSS风险"
+      regex: true
+      pattern: "\\.prepend\\s*\\("
+      
+    - name: "jQuery replaceWith方法"
+      function: ".replaceWith("
+      description: "jQuery替换元素，可能存在XSS风险"
+      regex: true
+      pattern: "\\.replaceWith\\s*\\("
+      
+    - name: "jQuery wrap方法"
+      function: ".wrap("
+      description: "jQuery包装元素，可能存在XSS风险"
+      regex: true
+      pattern: "\\.wrap\\s*\\("
+      
+    - name: "$()选择器注入"
+      function: "$("
+      description: "jQuery选择器，用户输入可能导致选择器注入"
+      regex: true
+      pattern: "\\$\\s*\\(\\s*\\$"
+      
+    - name: "document.execCommand命令执行"
+      function: "document.execCommand("
+      description: "执行文档命令，可能存在安全风险"
+      regex: true
+      pattern: "document\\.execCommand\\s*\\("
+      
+    - name: "location.assign跳转"
+      function: "location.assign("
+      description: "页面跳转，可能存在开放重定向"
+      regex: true
+      pattern: "location\\.assign\\s*\\("
+      
+    - name: "location.replace跳转"
+      function: "location.replace("
+      description: "页面替换跳转，可能存在开放重定向"
+      regex: true
+      pattern: "location\\.replace\\s*\\("
+      
+    - name: "window.location.assign跳转"
+      function: "window.location.assign("
+      description: "窗口跳转，可能存在开放重定向"
+      regex: true
+      pattern: "window\\.location\\.assign\\s*\\("
+      
+    - name: "window.location.replace跳转"
+      function: "window.location.replace("
+      description: "窗口替换跳转，可能存在开放重定向"
+      regex: true
+      pattern: "window\\.location\\.replace\\s*\\("
+      
+    - name: "postMessage消息传递"
+      function: "postMessage("
+      description: "跨窗口消息传递，注意origin验证"
+      regex: true
+      pattern: "postMessage\\s*\\("
+      
+    - name: "Object.assign原型污染"
+      function: "Object.assign("
+      description: "对象分配，可能导致原型污染"
+      regex: true
+      pattern: "Object\\.assign\\s*\\("
+      
+    - name: "Object.create原型污染"
+      function: "Object.create("
+      description: "创建对象，注意原型污染风险"
+      regex: true
+      pattern: "Object\\.create\\s*\\("
+      
+    - name: "__proto__原型污染"
+      function: "__proto__"
+      description: "原型属性，可能导致原型污染"
+      regex: true
+      pattern: "__proto__"
+      
+    - name: "constructor.prototype原型污染"
+      function: "constructor.prototype"
+      description: "构造函数原型，可能导致原型污染"
+      regex: true
+      pattern: "constructor\\.prototype"
+      
+    - name: "sequelize.query SQL注入"
+      function: "sequelize.query("
+      description: "Sequelize原生查询，可能存在SQL注入"
+      regex: true
+      pattern: "sequelize\\.query\\s*\\("
+      
+    - name: "knex.raw SQL注入"
+      function: "knex.raw("
+      description: "Knex原生SQL，可能存在SQL注入"
+      regex: true
+      pattern: "knex\\.raw\\s*\\("
+      
+    - name: "mongoose.findOne NoSQL注入"
+      function: ".findOne("
+      description: "Mongoose查询，可能存在NoSQL注入"
+      regex: true
+      pattern: "\\.findOne\\s*\\("
+      
+    - name: "mongoose.$where NoSQL注入"
+      function: "$where:"
+      description: "Mongoose $where查询，存在代码注入风险"
+      regex: true
+      pattern: "\\$where\\s*:"
+      
+    - name: "mongodb.collection.find NoSQL注入"
+      function: "collection.find("
+      description: "MongoDB原生查询，可能存在NoSQL注入"
+      regex: true
+      pattern: "collection\\.find\\s*\\("
+      
+    - name: "redis.eval命令注入"
+      function: "redis.eval("
+      description: "Redis eval命令，可能存在Lua脚本注入"
+      regex: true
+      pattern: "redis\\.eval\\s*\\("
+      
+    - name: "request HTTP请求"
+      function: "request("
+      description: "HTTP请求库，可能存在SSRF风险"
+      regex: true
+      pattern: "request\\s*\\("
+      
+    - name: "got HTTP请求"
+      function: "got("
+      description: "Got HTTP客户端，可能存在SSRF风险"
+      regex: true
+      pattern: "got\\s*\\("
+      
+    - name: "node-fetch HTTP请求"
+      function: "node-fetch("
+      description: "Node-fetch请求，可能存在SSRF风险"
+      regex: true
+      pattern: "node-fetch\\s*\\("
+      
+    - name: "superagent HTTP请求"
+      function: "superagent"
+      description: "Superagent请求，可能存在SSRF风险"
+      regex: true
+      pattern: "superagent\\."
+      
+    - name: "http.get HTTP请求"
+      function: "http.get("
+      description: "Node.js HTTP GET请求，可能存在SSRF风险"
+      regex: true
+      pattern: "http\\.get\\s*\\("
+      
+    - name: "http.request HTTP请求"
+      function: "http.request("
+      description: "Node.js HTTP请求，可能存在SSRF风险"
+      regex: true
+      pattern: "http\\.request\\s*\\("
+      
+    - name: "https.get HTTPS请求"
+      function: "https.get("
+      description: "Node.js HTTPS GET请求，可能存在SSRF风险"
+      regex: true
+      pattern: "https\\.get\\s*\\("
+      
+    - name: "https.request HTTPS请求"
+      function: "https.request("
+      description: "Node.js HTTPS请求，可能存在SSRF风险"
+      regex: true
+      pattern: "https\\.request\\s*\\("
+      
+    - name: "dns.lookup DNS查询"
+      function: "dns.lookup("
+      description: "DNS查询，可能存在SSRF风险"
+      regex: true
+      pattern: "dns\\.lookup\\s*\\("
+      
+    - name: "dns.resolve DNS解析"
+      function: "dns.resolve("
+      description: "DNS解析，可能存在SSRF风险"
+      regex: true
+      pattern: "dns\\.resolve\\s*\\("
+      
+    - name: "unserialize反序列化"
+      function: "unserialize("
+      description: "反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "unserialize\\s*\\("
+      
+    - name: "node-yaml YAML解析"
+      function: "yaml.load("
+      description: "YAML加载，可能存在代码执行风险"
+      regex: true
+      pattern: "yaml\\.load\\s*\\("
+      
+    - name: "js-yaml YAML解析"
+      function: "safeLoad("
+      description: "YAML安全加载"
+      regex: true
+      pattern: "safeLoad\\s*\\("
+
+  medium:
+    - name: "fs.readFile文件读取"
+      function: "fs.readFile("
+      description: "读取文件，注意路径验证防止路径遍历"
+      regex: true
+      pattern: "fs\\.readFile\\s*\\("
+      
+    - name: "fs.readFileSync文件读取"
+      function: "fs.readFileSync("
+      description: "同步读取文件，注意路径验证"
+      regex: true
+      pattern: "fs\\.readFileSync\\s*\\("
+      
+    - name: "fs.writeFile文件写入"
+      function: "fs.writeFile("
+      description: "写入文件，注意路径和内容验证"
+      regex: true
+      pattern: "fs\\.writeFile\\s*\\("
+      
+    - name: "fs.writeFileSync文件写入"
+      function: "fs.writeFileSync("
+      description: "同步写入文件，注意路径和内容验证"
+      regex: true
+      pattern: "fs\\.writeFileSync\\s*\\("
+      
+    - name: "fs.unlink文件删除"
+      function: "fs.unlink("
+      description: "删除文件，注意路径验证"
+      regex: true
+      pattern: "fs\\.unlink\\s*\\("
+      
+    - name: "path.join路径拼接"
+      function: "path.join("
+      description: "路径拼接，注意路径遍历风险"
+      regex: true
+      pattern: "path\\.join\\s*\\("
+      
+    - name: "multer文件上传"
+      function: "multer("
+      description: "文件上传中间件，注意文件类型和大小限制"
+      regex: true
+      pattern: "multer\\s*\\("
+      
+    - name: "express-fileupload文件上传"
+      function: "fileUpload("
+      description: "文件上传，注意文件类型验证"
+      regex: true
+      pattern: "fileUpload\\s*\\("
+      
+    - name: "Cookie操作"
+      function: "document.cookie"
+      description: "Cookie操作，注意HttpOnly和Secure标志"
+      regex: true
+      pattern: "document\\.cookie"
+      
+    - name: "localStorage存储"
+      function: "localStorage"
+      description: "本地存储，不应存储敏感信息"
+      regex: true
+      pattern: "localStorage\\."
+      
+    - name: "sessionStorage存储"
+      function: "sessionStorage"
+      description: "会话存储，不应存储敏感信息"
+      regex: true
+      pattern: "sessionStorage\\."
+      
+    - name: "Math.random随机数"
+      function: "Math.random("
+      description: "伪随机数生成器，不适合加密场景"
+      regex: true
+      pattern: "Math\\.random\\s*\\("
+      
+    - name: "crypto.pseudoRandomBytes"
+      function: "crypto.pseudoRandomBytes("
+      description: "伪随机字节，不适合加密场景，应使用randomBytes"
+      regex: true
+      pattern: "crypto\\.pseudoRandomBytes\\s*\\("
+      
+    - name: "res.redirect重定向"
+      function: "res.redirect("
+      description: "HTTP重定向，可能存在开放重定向漏洞"
+      regex: true
+      pattern: "res\\.redirect\\s*\\("
+      
+    - name: "window.open打开窗口"
+      function: "window.open("
+      description: "打开新窗口，注意URL验证"
+      regex: true
+      pattern: "window\\.open\\s*\\("
+      
+    - name: "fs.readdir目录读取"
+      function: "fs.readdir("
+      description: "读取目录，可能存在目录遍历风险"
+      regex: true
+      pattern: "fs\\.readdir\\s*\\("
+      
+    - name: "fs.readdirSync目录读取"
+      function: "fs.readdirSync("
+      description: "同步读取目录，可能存在目录遍历风险"
+      regex: true
+      pattern: "fs\\.readdirSync\\s*\\("
+      
+    - name: "fs.stat文件信息"
+      function: "fs.stat("
+      description: "获取文件信息"
+      regex: true
+      pattern: "fs\\.stat\\s*\\("
+      
+    - name: "fs.access文件访问检查"
+      function: "fs.access("
+      description: "检查文件访问权限"
+      regex: true
+      pattern: "fs\\.access\\s*\\("
+      
+    - name: "fs.exists文件存在检查"
+      function: "fs.exists("
+      description: "检查文件是否存在（已废弃）"
+      regex: true
+      pattern: "fs\\.exists\\s*\\("
+      
+    - name: "fs.mkdir目录创建"
+      function: "fs.mkdir("
+      description: "创建目录，注意路径验证"
+      regex: true
+      pattern: "fs\\.mkdir\\s*\\("
+      
+    - name: "fs.rmdir目录删除"
+      function: "fs.rmdir("
+      description: "删除目录，注意路径验证"
+      regex: true
+      pattern: "fs\\.rmdir\\s*\\("
+      
+    - name: "fs.rm文件删除"
+      function: "fs.rm("
+      description: "删除文件或目录，注意路径验证"
+      regex: true
+      pattern: "fs\\.rm\\s*\\("
+      
+    - name: "fs.rename文件重命名"
+      function: "fs.rename("
+      description: "重命名文件，注意路径验证"
+      regex: true
+      pattern: "fs\\.rename\\s*\\("
+      
+    - name: "fs.copyFile文件复制"
+      function: "fs.copyFile("
+      description: "复制文件，注意路径验证"
+      regex: true
+      pattern: "fs\\.copyFile\\s*\\("
+      
+    - name: "fs.appendFile文件追加"
+      function: "fs.appendFile("
+      description: "追加文件内容，注意路径验证"
+      regex: true
+      pattern: "fs\\.appendFile\\s*\\("
+      
+    - name: "fs.chmod文件权限"
+      function: "fs.chmod("
+      description: "修改文件权限"
+      regex: true
+      pattern: "fs\\.chmod\\s*\\("
+      
+    - name: "fs.chown文件所有者"
+      function: "fs.chown("
+      description: "修改文件所有者"
+      regex: true
+      pattern: "fs\\.chown\\s*\\("
+      
+    - name: "fs.createReadStream文件流"
+      function: "fs.createReadStream("
+      description: "创建读取流，注意路径验证"
+      regex: true
+      pattern: "fs\\.createReadStream\\s*\\("
+      
+    - name: "fs.createWriteStream文件流"
+      function: "fs.createWriteStream("
+      description: "创建写入流，注意路径验证"
+      regex: true
+      pattern: "fs\\.createWriteStream\\s*\\("
+      
+    - name: "path.resolve路径解析"
+      function: "path.resolve("
+      description: "解析路径，注意路径遍历"
+      regex: true
+      pattern: "path\\.resolve\\s*\\("
+      
+    - name: "path.normalize路径规范化"
+      function: "path.normalize("
+      description: "规范化路径，注意路径遍历"
+      regex: true
+      pattern: "path\\.normalize\\s*\\("
+      
+    - name: "path.relative相对路径"
+      function: "path.relative("
+      description: "计算相对路径"
+      regex: true
+      pattern: "path\\.relative\\s*\\("
+      
+    - name: "os.homedir主目录"
+      function: "os.homedir("
+      description: "获取用户主目录，可能泄露路径信息"
+      regex: true
+      pattern: "os\\.homedir\\s*\\("
+      
+    - name: "os.tmpdir临时目录"
+      function: "os.tmpdir("
+      description: "获取临时目录路径"
+      regex: true
+      pattern: "os\\.tmpdir\\s*\\("
+      
+    - name: "process.env环境变量"
+      function: "process.env"
+      description: "访问环境变量，可能泄露敏感信息"
+      regex: true
+      pattern: "process\\.env"
+      
+    - name: "process.cwd当前目录"
+      function: "process.cwd("
+      description: "获取当前工作目录，可能泄露路径信息"
+      regex: true
+      pattern: "process\\.cwd\\s*\\("
+      
+    - name: "process.chdir目录切换"
+      function: "process.chdir("
+      description: "切换工作目录"
+      regex: true
+      pattern: "process\\.chdir\\s*\\("
+      
+    - name: "process.exit程序退出"
+      function: "process.exit("
+      description: "退出进程"
+      regex: true
+      pattern: "process\\.exit\\s*\\("
+      
+    - name: "EJS模板引擎"
+      function: "ejs.render("
+      description: "EJS模板渲染，可能存在SSTI风险"
+      regex: true
+      pattern: "ejs\\.render\\s*\\("
+      
+    - name: "Pug模板引擎"
+      function: "pug.render("
+      description: "Pug模板渲染，可能存在SSTI风险"
+      regex: true
+      pattern: "pug\\.render\\s*\\("
+      
+    - name: "Handlebars模板引擎"
+      function: "Handlebars.compile("
+      description: "Handlebars模板编译"
+      regex: true
+      pattern: "Handlebars\\.compile\\s*\\("
+      
+    - name: "Mustache模板引擎"
+      function: "Mustache.render("
+      description: "Mustache模板渲染"
+      regex: true
+      pattern: "Mustache\\.render\\s*\\("
+      
+    - name: "Nunjucks模板引擎"
+      function: "nunjucks.renderString("
+      description: "Nunjucks模板渲染，可能存在SSTI风险"
+      regex: true
+      pattern: "nunjucks\\.renderString\\s*\\("
+      
+    - name: "res.send响应发送"
+      function: "res.send("
+      description: "Express发送响应"
+      regex: true
+      pattern: "res\\.send\\s*\\("
+      
+    - name: "res.json JSON响应"
+      function: "res.json("
+      description: "Express发送JSON响应"
+      regex: true
+      pattern: "res\\.json\\s*\\("
+      
+    - name: "res.sendFile文件发送"
+      function: "res.sendFile("
+      description: "Express发送文件，注意路径验证"
+      regex: true
+      pattern: "res\\.sendFile\\s*\\("
+      
+    - name: "res.download文件下载"
+      function: "res.download("
+      description: "Express文件下载，注意路径验证"
+      regex: true
+      pattern: "res\\.download\\s*\\("
+      
+    - name: "res.render模板渲染"
+      function: "res.render("
+      description: "Express渲染模板"
+      regex: true
+      pattern: "res\\.render\\s*\\("
+      
+    - name: "res.cookie Cookie设置"
+      function: "res.cookie("
+      description: "Express设置Cookie，注意安全标志"
+      regex: true
+      pattern: "res\\.cookie\\s*\\("
+      
+    - name: "req.query查询参数"
+      function: "req.query"
+      description: "Express查询参数，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "req\\.query"
+      
+    - name: "req.params路由参数"
+      function: "req.params"
+      description: "Express路由参数，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "req\\.params"
+      
+    - name: "req.body请求体"
+      function: "req.body"
+      description: "Express请求体，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "req\\.body"
+      
+    - name: "req.cookies Cookies"
+      function: "req.cookies"
+      description: "Express Cookies，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "req\\.cookies"
+      
+    - name: "req.headers请求头"
+      function: "req.headers"
+      description: "Express请求头，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "req\\.headers"
+      
+    - name: "crypto.createCipher加密"
+      function: "crypto.createCipher("
+      description: "创建加密器（已废弃），应使用createCipheriv"
+      regex: true
+      pattern: "crypto\\.createCipher\\s*\\("
+      
+    - name: "crypto.createDecipher解密"
+      function: "crypto.createDecipher("
+      description: "创建解密器（已废弃），应使用createDecipheriv"
+      regex: true
+      pattern: "crypto\\.createDecipher\\s*\\("
+      
+    - name: "crypto.createHash哈希"
+      function: "crypto.createHash("
+      description: "创建哈希，注意使用安全算法"
+      regex: true
+      pattern: "crypto\\.createHash\\s*\\("
+      
+    - name: "bcrypt.hash密码哈希"
+      function: "bcrypt.hash("
+      description: "bcrypt密码哈希"
+      regex: true
+      pattern: "bcrypt\\.hash\\s*\\("
+      
+    - name: "jwt.sign JWT签名"
+      function: "jwt.sign("
+      description: "JWT签名，注意密钥安全"
+      regex: true
+      pattern: "jwt\\.sign\\s*\\("
+      
+    - name: "jwt.verify JWT验证"
+      function: "jwt.verify("
+      description: "JWT验证，注意算法选择"
+      regex: true
+      pattern: "jwt\\.verify\\s*\\("
+      
+    - name: "jwt.decode JWT解码"
+      function: "jwt.decode("
+      description: "JWT解码（不验证签名）"
+      regex: true
+      pattern: "jwt\\.decode\\s*\\("
+      
+    - name: "net.createServer TCP服务器"
+      function: "net.createServer("
+      description: "创建TCP服务器"
+      regex: true
+      pattern: "net\\.createServer\\s*\\("
+      
+    - name: "net.connect TCP连接"
+      function: "net.connect("
+      description: "创建TCP连接，可能存在SSRF风险"
+      regex: true
+      pattern: "net\\.connect\\s*\\("
+      
+    - name: "dgram.createSocket UDP套接字"
+      function: "dgram.createSocket("
+      description: "创建UDP套接字"
+      regex: true
+      pattern: "dgram\\.createSocket\\s*\\("
+      
+    - name: "websocket WebSocket"
+      function: "WebSocket("
+      description: "WebSocket连接，注意origin验证"
+      regex: true
+      pattern: "new\\s+WebSocket\\s*\\("
+      
+    - name: "socket.io Socket.IO"
+      function: "io.connect("
+      description: "Socket.IO连接"
+      regex: true
+      pattern: "io\\.connect\\s*\\("
+
+  low:
+    - name: "console.log调试输出"
+      function: "console.log("
+      description: "控制台输出，生产环境应移除或使用日志"
+      regex: true
+      pattern: "console\\.log\\s*\\("
+      
+    - name: "console.error调试输出"
+      function: "console.error("
+      description: "错误输出，生产环境应使用日志框架"
+      regex: true
+      pattern: "console\\.error\\s*\\("
+      
+    - name: "console.warn调试输出"
+      function: "console.warn("
+      description: "警告输出，生产环境应使用日志框架"
+      regex: true
+      pattern: "console\\.warn\\s*\\("
+      
+    - name: "console.debug调试输出"
+      function: "console.debug("
+      description: "调试输出，生产环境应移除"
+      regex: true
+      pattern: "console\\.debug\\s*\\("
+      
+    - name: "alert弹窗"
+      function: "alert("
+      description: "弹出警告框，生产环境应使用更好的提示方式"
+      regex: true
+      pattern: "alert\\s*\\("
+      
+    - name: "confirm确认框"
+      function: "confirm("
+      description: "弹出确认框，考虑使用更好的UI"
+      regex: true
+      pattern: "confirm\\s*\\("
+      
+    - name: "prompt输入框"
+      function: "prompt("
+      description: "弹出输入框，考虑使用更好的UI"
+      regex: true
+      pattern: "prompt\\s*\\("
+      
+    - name: "debugger调试语句"
+      function: "debugger"
+      description: "调试断点，生产环境应移除"
+      regex: true
+      pattern: "debugger"
+      
+    - name: "console.info调试输出"
+      function: "console.info("
+      description: "信息输出，生产环境应使用日志框架"
+      regex: true
+      pattern: "console\\.info\\s*\\("
+      
+    - name: "console.trace调试追踪"
+      function: "console.trace("
+      description: "堆栈追踪输出，生产环境应移除"
+      regex: true
+      pattern: "console\\.trace\\s*\\("
+      
+    - name: "console.table表格输出"
+      function: "console.table("
+      description: "表格输出，生产环境应移除"
+      regex: true
+      pattern: "console\\.table\\s*\\("
+      
+    - name: "console.dir对象输出"
+      function: "console.dir("
+      description: "对象输出，生产环境应移除"
+      regex: true
+      pattern: "console\\.dir\\s*\\("
+      
+    - name: "console.time计时器"
+      function: "console.time("
+      description: "计时器开始，生产环境应移除"
+      regex: true
+      pattern: "console\\.time\\s*\\("
+      
+    - name: "console.timeEnd计时器"
+      function: "console.timeEnd("
+      description: "计时器结束，生产环境应移除"
+      regex: true
+      pattern: "console\\.timeEnd\\s*\\("
+      
+    - name: "console.assert断言"
+      function: "console.assert("
+      description: "断言输出，生产环境应移除"
+      regex: true
+      pattern: "console\\.assert\\s*\\("
+      
+    - name: "console.count计数器"
+      function: "console.count("
+      description: "计数器，生产环境应移除"
+      regex: true
+      pattern: "console\\.count\\s*\\("
+      
+    - name: "console.clear清空控制台"
+      function: "console.clear("
+      description: "清空控制台，生产环境应移除"
+      regex: true
+      pattern: "console\\.clear\\s*\\("
+      
+    - name: "process.argv命令行参数"
+      function: "process.argv"
+      description: "命令行参数，注意参数验证"
+      regex: true
+      pattern: "process\\.argv"
+      
+    - name: "process.version Node版本"
+      function: "process.version"
+      description: "Node.js版本信息，可能泄露版本信息"
+      regex: true
+      pattern: "process\\.version"
+      
+    - name: "process.platform平台信息"
+      function: "process.platform"
+      description: "平台信息，可能泄露系统信息"
+      regex: true
+      pattern: "process\\.platform"
+      
+    - name: "process.arch架构信息"
+      function: "process.arch"
+      description: "架构信息，可能泄露系统信息"
+      regex: true
+      pattern: "process\\.arch"
+      
+    - name: "process.pid进程ID"
+      function: "process.pid"
+      description: "进程ID"
+      regex: true
+      pattern: "process\\.pid"
+      
+    - name: "process.ppid父进程ID"
+      function: "process.ppid"
+      description: "父进程ID"
+      regex: true
+      pattern: "process\\.ppid"
+      
+    - name: "os.hostname主机名"
+      function: "os.hostname("
+      description: "获取主机名，可能泄露主机信息"
+      regex: true
+      pattern: "os\\.hostname\\s*\\("
+      
+    - name: "os.platform平台"
+      function: "os.platform("
+      description: "获取操作系统平台，可能泄露系统信息"
+      regex: true
+      pattern: "os\\.platform\\s*\\("
+      
+    - name: "os.type系统类型"
+      function: "os.type("
+      description: "获取操作系统类型，可能泄露系统信息"
+      regex: true
+      pattern: "os\\.type\\s*\\("
+      
+    - name: "os.release系统版本"
+      function: "os.release("
+      description: "获取操作系统版本，可能泄露系统信息"
+      regex: true
+      pattern: "os\\.release\\s*\\("
+      
+    - name: "os.arch系统架构"
+      function: "os.arch("
+      description: "获取系统架构，可能泄露系统信息"
+      regex: true
+      pattern: "os\\.arch\\s*\\("
+      
+    - name: "os.cpus CPU信息"
+      function: "os.cpus("
+      description: "获取CPU信息，可能泄露系统信息"
+      regex: true
+      pattern: "os\\.cpus\\s*\\("
+      
+    - name: "os.totalmem总内存"
+      function: "os.totalmem("
+      description: "获取总内存，可能泄露系统信息"
+      regex: true
+      pattern: "os\\.totalmem\\s*\\("
+      
+    - name: "os.freemem空闲内存"
+      function: "os.freemem("
+      description: "获取空闲内存，可能泄露系统信息"
+      regex: true
+      pattern: "os\\.freemem\\s*\\("
+      
+    - name: "os.userInfo用户信息"
+      function: "os.userInfo("
+      description: "获取用户信息，可能泄露用户信息"
+      regex: true
+      pattern: "os\\.userInfo\\s*\\("
+      
+    - name: "os.networkInterfaces网络接口"
+      function: "os.networkInterfaces("
+      description: "获取网络接口信息，可能泄露网络信息"
+      regex: true
+      pattern: "os\\.networkInterfaces\\s*\\("
+      
+    - name: "navigator.userAgent UA信息"
+      function: "navigator.userAgent"
+      description: "浏览器UA信息"
+      regex: true
+      pattern: "navigator\\.userAgent"
+      
+    - name: "navigator.platform平台信息"
+      function: "navigator.platform"
+      description: "浏览器平台信息"
+      regex: true
+      pattern: "navigator\\.platform"
+      
+    - name: "navigator.language语言信息"
+      function: "navigator.language"
+      description: "浏览器语言信息"
+      regex: true
+      pattern: "navigator\\.language"
+      
+    - name: "screen.width屏幕宽度"
+      function: "screen.width"
+      description: "屏幕宽度信息"
+      regex: true
+      pattern: "screen\\.width"
+      
+    - name: "screen.height屏幕高度"
+      function: "screen.height"
+      description: "屏幕高度信息"
+      regex: true
+      pattern: "screen\\.height"
+      
+    - name: "Date.now时间戳"
+      function: "Date.now("
+      description: "获取当前时间戳"
+      regex: true
+      pattern: "Date\\.now\\s*\\("
+      
+    - name: "Error.stack错误堆栈"
+      function: "Error.stack"
+      description: "错误堆栈信息，可能泄露路径信息"
+      regex: true
+      pattern: "Error.*\\.stack"
+      
+    - name: "Error.message错误消息"
+      function: "Error.message"
+      description: "错误消息，可能泄露敏感信息"
+      regex: true
+      pattern: "Error.*\\.message"
+      
+    - name: "throw抛出异常"
+      function: "throw "
+      description: "抛出异常"
+      regex: true
+      pattern: "throw\\s+"
+      
+    - name: "typeof类型检查"
+      function: "typeof "
+      description: "类型检查"
+      regex: true
+      pattern: "typeof\\s+"
+      
+    - name: "instanceof实例检查"
+      function: "instanceof "
+      description: "实例检查"
+      regex: true
+      pattern: "instanceof\\s+"
+      
+    - name: "Object.keys对象键"
+      function: "Object.keys("
+      description: "获取对象键"
+      regex: true
+      pattern: "Object\\.keys\\s*\\("
+      
+    - name: "Object.values对象值"
+      function: "Object.values("
+      description: "获取对象值"
+      regex: true
+      pattern: "Object\\.values\\s*\\("
+      
+    - name: "Object.entries对象条目"
+      function: "Object.entries("
+      description: "获取对象条目"
+      regex: true
+      pattern: "Object\\.entries\\s*\\("
+      
+    - name: "JSON.stringify JSON序列化"
+      function: "JSON.stringify("
+      description: "JSON序列化"
+      regex: true
+      pattern: "JSON\\.stringify\\s*\\("
+      
+    - name: "parseInt整数解析"
+      function: "parseInt("
+      description: "解析整数，注意基数参数"
+      regex: true
+      pattern: "parseInt\\s*\\("
+      
+    - name: "parseFloat浮点解析"
+      function: "parseFloat("
+      description: "解析浮点数"
+      regex: true
+      pattern: "parseFloat\\s*\\("
+      
+    - name: "encodeURI URL编码"
+      function: "encodeURI("
+      description: "URL编码"
+      regex: true
+      pattern: "encodeURI\\s*\\("
+      
+    - name: "decodeURI URL解码"
+      function: "decodeURI("
+      description: "URL解码"
+      regex: true
+      pattern: "decodeURI\\s*\\("
+      
+    - name: "encodeURIComponent URI组件编码"
+      function: "encodeURIComponent("
+      description: "URI组件编码"
+      regex: true
+      pattern: "encodeURIComponent\\s*\\("
+      
+    - name: "decodeURIComponent URI组件解码"
+      function: "decodeURIComponent("
+      description: "URI组件解码"
+      regex: true
+      pattern: "decodeURIComponent\\s*\\("
+      
+    - name: "btoa Base64编码"
+      function: "btoa("
+      description: "Base64编码（浏览器）"
+      regex: true
+      pattern: "btoa\\s*\\("
+      
+    - name: "atob Base64解码"
+      function: "atob("
+      description: "Base64解码（浏览器）"
+      regex: true
+      pattern: "atob\\s*\\("
+      
+    - name: "escape字符串转义"
+      function: "escape("
+      description: "字符串转义（已废弃）"
+      regex: true
+      pattern: "escape\\s*\\("
+      
+    - name: "unescape字符串反转义"
+      function: "unescape("
+      description: "字符串反转义（已废弃）"
+      regex: true
+      pattern: "unescape\\s*\\("
+

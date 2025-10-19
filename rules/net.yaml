@@ -1,0 +1,1011 @@
+language: .NET
+version: "1.0"
+description: ".NET/C#代码审计规则集"
+
+rules:
+  critical:
+    - name: "Process.Start命令执行"
+      function: "Process.Start("
+      description: "执行系统命令，可能存在命令注入风险"
+      regex: true
+      pattern: "Process\\.Start\\s*\\("
+      
+    - name: "CodeDomProvider代码编译"
+      function: "CodeDomProvider.CompileAssemblyFromSource("
+      description: "动态编译代码，可能存在代码注入风险"
+      regex: true
+      pattern: "CompileAssemblyFromSource\\s*\\("
+      
+    - name: "Assembly.Load动态加载"
+      function: "Assembly.Load("
+      description: "动态加载程序集，可能加载恶意程序集"
+      regex: true
+      pattern: "Assembly\\.Load\\s*\\("
+      
+    - name: "Activator.CreateInstance反射创建"
+      function: "Activator.CreateInstance("
+      description: "反射创建对象，可能被利用执行任意代码"
+      regex: true
+      pattern: "Activator\\.CreateInstance\\s*\\("
+      
+    - name: "MethodInfo.Invoke反射调用"
+      function: "MethodInfo.Invoke("
+      description: "反射调用方法，可能被利用执行任意代码"
+      regex: true
+      pattern: "MethodInfo.*\\.Invoke\\s*\\("
+      
+    - name: "eval执行"
+      function: "eval("
+      description: "执行JavaScript代码（在某些框架中），存在代码注入风险"
+      regex: true
+      pattern: "eval\\s*\\("
+      
+    - name: "Assembly.LoadFrom动态加载"
+      function: "Assembly.LoadFrom("
+      description: "从文件加载程序集，可能加载恶意程序集"
+      regex: true
+      pattern: "Assembly\\.LoadFrom\\s*\\("
+      
+    - name: "Assembly.LoadFile动态加载"
+      function: "Assembly.LoadFile("
+      description: "从文件加载程序集，可能加载恶意程序集"
+      regex: true
+      pattern: "Assembly\\.LoadFile\\s*\\("
+      
+    - name: "Assembly.UnsafeLoadFrom不安全加载"
+      function: "Assembly.UnsafeLoadFrom("
+      description: "不安全地加载程序集，存在严重安全风险"
+      regex: true
+      pattern: "Assembly\\.UnsafeLoadFrom\\s*\\("
+      
+    - name: "Type.InvokeMember反射调用"
+      function: "Type.InvokeMember("
+      description: "反射调用成员，可能被利用执行任意代码"
+      regex: true
+      pattern: "Type.*\\.InvokeMember\\s*\\("
+      
+    - name: "AppDomain.CreateInstance跨域创建"
+      function: "AppDomain.CreateInstance("
+      description: "跨应用程序域创建对象，可能存在安全风险"
+      regex: true
+      pattern: "AppDomain.*\\.CreateInstance\\s*\\("
+      
+    - name: "CSharpCodeProvider代码编译"
+      function: "CSharpCodeProvider.CompileAssembly"
+      description: "动态编译C#代码，可能存在代码注入风险"
+      regex: true
+      pattern: "CSharpCodeProvider.*\\.CompileAssembly"
+      
+    - name: "VBCodeProvider代码编译"
+      function: "VBCodeProvider.CompileAssembly"
+      description: "动态编译VB代码，可能存在代码注入风险"
+      regex: true
+      pattern: "VBCodeProvider.*\\.CompileAssembly"
+      
+    - name: "IronPython.Hosting代码执行"
+      function: "Python.CreateEngine("
+      description: "创建Python引擎执行代码，可能存在代码注入风险"
+      regex: true
+      pattern: "Python\\.CreateEngine\\s*\\("
+      
+    - name: "ProcessStartInfo命令执行"
+      function: "ProcessStartInfo"
+      description: "配置进程启动信息，可能存在命令注入风险"
+      regex: true
+      pattern: "new\\s+ProcessStartInfo\\s*\\("
+      
+    - name: "PowerShell命令执行"
+      function: "PowerShell.Create("
+      description: "执行PowerShell命令，存在严重的命令注入风险"
+      regex: true
+      pattern: "PowerShell\\.Create\\s*\\("
+      
+    - name: "Runspace.CreateRunspace命令执行"
+      function: "RunspaceFactory.CreateRunspace("
+      description: "创建PowerShell运行空间，可能执行任意命令"
+      regex: true
+      pattern: "RunspaceFactory\\.CreateRunspace\\s*\\("
+
+  high:
+    - name: "BinaryFormatter反序列化"
+      function: "BinaryFormatter.Deserialize("
+      description: "二进制反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "BinaryFormatter.*\\.Deserialize\\s*\\("
+      
+    - name: "NetDataContractSerializer反序列化"
+      function: "NetDataContractSerializer.Deserialize("
+      description: "数据契约反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "NetDataContractSerializer.*\\.Deserialize\\s*\\("
+      
+    - name: "JavaScriptSerializer反序列化"
+      function: "JavaScriptSerializer.Deserialize("
+      description: "JavaScript序列化器反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "JavaScriptSerializer.*\\.Deserialize\\s*\\("
+      
+    - name: "XmlSerializer反序列化"
+      function: "XmlSerializer.Deserialize("
+      description: "XML反序列化，可能存在XXE或反序列化漏洞"
+      regex: true
+      pattern: "XmlSerializer.*\\.Deserialize\\s*\\("
+      
+    - name: "SQL命令执行"
+      function: "SqlCommand"
+      description: "SQL命令执行，注意SQL注入风险"
+      regex: true
+      pattern: "new\\s+SqlCommand\\s*\\("
+      
+    - name: "ExecuteNonQuery执行"
+      function: "ExecuteNonQuery("
+      description: "执行SQL命令，注意SQL注入风险"
+      regex: true
+      pattern: "ExecuteNonQuery\\s*\\("
+      
+    - name: "ExecuteReader执行"
+      function: "ExecuteReader("
+      description: "执行SQL查询，注意SQL注入风险"
+      regex: true
+      pattern: "ExecuteReader\\s*\\("
+      
+    - name: "ExecuteScalar执行"
+      function: "ExecuteScalar("
+      description: "执行SQL查询返回单值，注意SQL注入风险"
+      regex: true
+      pattern: "ExecuteScalar\\s*\\("
+      
+    - name: "XPath查询"
+      function: "XPathNavigator.Compile("
+      description: "XPath查询，可能存在XPath注入风险"
+      regex: true
+      pattern: "XPathNavigator.*\\.Compile\\s*\\("
+      
+    - name: "LDAP查询"
+      function: "DirectorySearcher"
+      description: "LDAP查询，可能存在LDAP注入风险"
+      regex: true
+      pattern: "new\\s+DirectorySearcher\\s*\\("
+      
+    - name: "XXE漏洞"
+      function: "XmlDocument.Load("
+      description: "XML文档加载，可能存在XXE漏洞"
+      regex: true
+      pattern: "XmlDocument.*\\.Load\\s*\\("
+      
+    - name: "XXE漏洞-XmlTextReader"
+      function: "XmlTextReader"
+      description: "XML读取器，可能存在XXE漏洞"
+      regex: true
+      pattern: "new\\s+XmlTextReader\\s*\\("
+      
+    - name: "SoapFormatter反序列化"
+      function: "SoapFormatter.Deserialize("
+      description: "SOAP格式反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "SoapFormatter.*\\.Deserialize\\s*\\("
+      
+    - name: "LosFormatter反序列化"
+      function: "LosFormatter.Deserialize("
+      description: "Limited Object Serialization反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "LosFormatter.*\\.Deserialize\\s*\\("
+      
+    - name: "ObjectStateFormatter反序列化"
+      function: "ObjectStateFormatter.Deserialize("
+      description: "对象状态反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "ObjectStateFormatter.*\\.Deserialize\\s*\\("
+      
+    - name: "JsonConvert.DeserializeObject反序列化"
+      function: "JsonConvert.DeserializeObject("
+      description: "JSON.NET反序列化，注意TypeNameHandling设置可能导致反序列化漏洞"
+      regex: true
+      pattern: "JsonConvert\\.DeserializeObject\\s*\\("
+      
+    - name: "DataContractSerializer反序列化"
+      function: "DataContractSerializer.ReadObject("
+      description: "数据契约序列化器读取对象，可能存在反序列化漏洞"
+      regex: true
+      pattern: "DataContractSerializer.*\\.ReadObject\\s*\\("
+      
+    - name: "DataContractJsonSerializer反序列化"
+      function: "DataContractJsonSerializer.ReadObject("
+      description: "JSON数据契约反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "DataContractJsonSerializer.*\\.ReadObject\\s*\\("
+      
+    - name: "FastJSON.Deserialize反序列化"
+      function: "JSON.ToObject("
+      description: "FastJSON反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "JSON\\.ToObject\\s*\\("
+      
+    - name: "XmlReader.Create XXE"
+      function: "XmlReader.Create("
+      description: "XML读取器创建，可能存在XXE漏洞"
+      regex: true
+      pattern: "XmlReader\\.Create\\s*\\("
+      
+    - name: "XDocument.Load XXE"
+      function: "XDocument.Load("
+      description: "加载XML文档，可能存在XXE漏洞"
+      regex: true
+      pattern: "XDocument\\.Load\\s*\\("
+      
+    - name: "XDocument.Parse XXE"
+      function: "XDocument.Parse("
+      description: "解析XML字符串，可能存在XXE漏洞"
+      regex: true
+      pattern: "XDocument\\.Parse\\s*\\("
+      
+    - name: "XElement.Load XXE"
+      function: "XElement.Load("
+      description: "加载XML元素，可能存在XXE漏洞"
+      regex: true
+      pattern: "XElement\\.Load\\s*\\("
+      
+    - name: "XPathDocument XXE"
+      function: "XPathDocument"
+      description: "XPath文档，可能存在XXE漏洞"
+      regex: true
+      pattern: "new\\s+XPathDocument\\s*\\("
+      
+    - name: "XslCompiledTransform XSLT"
+      function: "XslCompiledTransform.Load("
+      description: "XSLT转换，可能存在XXE或脚本注入风险"
+      regex: true
+      pattern: "XslCompiledTransform.*\\.Load\\s*\\("
+      
+    - name: "XPathNavigator.Evaluate XPath注入"
+      function: "XPathNavigator.Evaluate("
+      description: "执行XPath表达式，可能存在XPath注入"
+      regex: true
+      pattern: "XPathNavigator.*\\.Evaluate\\s*\\("
+      
+    - name: "XPathNavigator.Select XPath注入"
+      function: "XPathNavigator.Select("
+      description: "XPath查询，可能存在XPath注入"
+      regex: true
+      pattern: "XPathNavigator.*\\.Select\\s*\\("
+      
+    - name: "DirectoryEntry LDAP注入"
+      function: "DirectoryEntry"
+      description: "LDAP目录条目，可能存在LDAP注入"
+      regex: true
+      pattern: "new\\s+DirectoryEntry\\s*\\("
+      
+    - name: "DirectorySearcher.Filter LDAP注入"
+      function: "DirectorySearcher.Filter"
+      description: "LDAP搜索过滤器，可能存在LDAP注入"
+      regex: true
+      pattern: "DirectorySearcher.*\\.Filter\\s*="
+      
+    - name: "OleDbCommand SQL注入"
+      function: "OleDbCommand"
+      description: "OleDb命令执行，注意SQL注入风险"
+      regex: true
+      pattern: "new\\s+OleDbCommand\\s*\\("
+      
+    - name: "OdbcCommand SQL注入"
+      function: "OdbcCommand"
+      description: "ODBC命令执行，注意SQL注入风险"
+      regex: true
+      pattern: "new\\s+OdbcCommand\\s*\\("
+      
+    - name: "MySqlCommand SQL注入"
+      function: "MySqlCommand"
+      description: "MySQL命令执行，注意SQL注入风险"
+      regex: true
+      pattern: "new\\s+MySqlCommand\\s*\\("
+      
+    - name: "NpgsqlCommand SQL注入"
+      function: "NpgsqlCommand"
+      description: "PostgreSQL命令执行，注意SQL注入风险"
+      regex: true
+      pattern: "new\\s+NpgsqlCommand\\s*\\("
+      
+    - name: "SqliteCommand SQL注入"
+      function: "SqliteCommand"
+      description: "SQLite命令执行，注意SQL注入风险"
+      regex: true
+      pattern: "new\\s+SqliteCommand\\s*\\("
+      
+    - name: "MongoClient.GetDatabase NoSQL注入"
+      function: "MongoClient.GetDatabase("
+      description: "MongoDB数据库操作，注意NoSQL注入风险"
+      regex: true
+      pattern: "MongoClient.*\\.GetDatabase\\s*\\("
+      
+    - name: "HttpClient SSRF"
+      function: "HttpClient"
+      description: "HTTP客户端，可能存在SSRF风险"
+      regex: true
+      pattern: "new\\s+HttpClient\\s*\\("
+      
+    - name: "WebRequest.Create SSRF"
+      function: "WebRequest.Create("
+      description: "创建Web请求，可能存在SSRF风险"
+      regex: true
+      pattern: "WebRequest\\.Create\\s*\\("
+      
+    - name: "RestClient SSRF"
+      function: "RestClient"
+      description: "REST客户端，可能存在SSRF风险"
+      regex: true
+      pattern: "new\\s+RestClient\\s*\\("
+      
+    - name: "SmtpClient邮件发送"
+      function: "SmtpClient"
+      description: "SMTP客户端，可能存在邮件头注入"
+      regex: true
+      pattern: "new\\s+SmtpClient\\s*\\("
+
+  medium:
+    - name: "文件读取File.ReadAllText"
+      function: "File.ReadAllText("
+      description: "读取文件内容，注意路径验证防止路径遍历"
+      regex: true
+      pattern: "File\\.ReadAllText\\s*\\("
+      
+    - name: "文件读取File.ReadAllBytes"
+      function: "File.ReadAllBytes("
+      description: "读取文件字节，注意路径验证"
+      regex: true
+      pattern: "File\\.ReadAllBytes\\s*\\("
+      
+    - name: "文件写入File.WriteAllText"
+      function: "File.WriteAllText("
+      description: "写入文件内容，注意路径验证"
+      regex: true
+      pattern: "File\\.WriteAllText\\s*\\("
+      
+    - name: "文件写入File.WriteAllBytes"
+      function: "File.WriteAllBytes("
+      description: "写入文件字节，注意路径验证"
+      regex: true
+      pattern: "File\\.WriteAllBytes\\s*\\("
+      
+    - name: "文件上传SaveAs"
+      function: "SaveAs("
+      description: "文件上传保存，注意文件类型和路径验证"
+      regex: true
+      pattern: "SaveAs\\s*\\("
+      
+    - name: "HTTP重定向Redirect"
+      function: "Response.Redirect("
+      description: "HTTP重定向，可能存在开放重定向漏洞"
+      regex: true
+      pattern: "Response\\.Redirect\\s*\\("
+      
+    - name: "HTTP重定向RedirectToAction"
+      function: "RedirectToAction("
+      description: "MVC重定向，注意参数验证"
+      regex: true
+      pattern: "RedirectToAction\\s*\\("
+      
+    - name: "Cookie操作"
+      function: "HttpCookie"
+      description: "Cookie操作，注意HttpOnly和Secure标志"
+      regex: true
+      pattern: "new\\s+HttpCookie\\s*\\("
+      
+    - name: "Session操作"
+      function: "Session["
+      description: "Session操作，注意Session安全"
+      regex: true
+      pattern: "Session\\["
+      
+    - name: "HTTP请求HttpWebRequest"
+      function: "HttpWebRequest"
+      description: "HTTP请求，注意SSRF风险"
+      regex: true
+      pattern: "HttpWebRequest"
+      
+    - name: "HTTP请求WebClient"
+      function: "WebClient"
+      description: "Web客户端请求，注意SSRF风险"
+      regex: true
+      pattern: "new\\s+WebClient\\s*\\("
+      
+    - name: "随机数Random"
+      function: "new Random("
+      description: "使用Random生成随机数，不适合加密场景，应使用RNGCryptoServiceProvider"
+      regex: true
+      pattern: "new\\s+Random\\s*\\("
+      
+    - name: "MD5哈希"
+      function: "MD5.Create("
+      description: "MD5算法不安全，不应用于密码哈希"
+      regex: true
+      pattern: "MD5\\.Create\\s*\\("
+      
+    - name: "SHA1哈希"
+      function: "SHA1.Create("
+      description: "SHA1算法不安全，不应用于密码哈希"
+      regex: true
+      pattern: "SHA1\\.Create\\s*\\("
+      
+    - name: "ViewState未加密"
+      function: "EnableViewState"
+      description: "ViewState可能包含敏感信息，注意加密和签名"
+      regex: true
+      pattern: "EnableViewState\\s*="
+      
+    - name: "File.ReadAllLines文件读取"
+      function: "File.ReadAllLines("
+      description: "读取文件所有行，注意路径验证"
+      regex: true
+      pattern: "File\\.ReadAllLines\\s*\\("
+      
+    - name: "File.Open文件打开"
+      function: "File.Open("
+      description: "打开文件，注意路径验证防止路径遍历"
+      regex: true
+      pattern: "File\\.Open\\s*\\("
+      
+    - name: "File.OpenRead文件读取"
+      function: "File.OpenRead("
+      description: "打开文件进行读取，注意路径验证"
+      regex: true
+      pattern: "File\\.OpenRead\\s*\\("
+      
+    - name: "File.OpenWrite文件写入"
+      function: "File.OpenWrite("
+      description: "打开文件进行写入，注意路径验证"
+      regex: true
+      pattern: "File\\.OpenWrite\\s*\\("
+      
+    - name: "File.Create文件创建"
+      function: "File.Create("
+      description: "创建或覆盖文件，注意路径验证"
+      regex: true
+      pattern: "File\\.Create\\s*\\("
+      
+    - name: "File.Delete文件删除"
+      function: "File.Delete("
+      description: "删除文件，注意路径验证"
+      regex: true
+      pattern: "File\\.Delete\\s*\\("
+      
+    - name: "File.Copy文件复制"
+      function: "File.Copy("
+      description: "复制文件，注意路径验证"
+      regex: true
+      pattern: "File\\.Copy\\s*\\("
+      
+    - name: "File.Move文件移动"
+      function: "File.Move("
+      description: "移动文件，注意路径验证"
+      regex: true
+      pattern: "File\\.Move\\s*\\("
+      
+    - name: "File.Exists文件检查"
+      function: "File.Exists("
+      description: "检查文件是否存在，注意路径验证"
+      regex: true
+      pattern: "File\\.Exists\\s*\\("
+      
+    - name: "Directory.GetFiles目录遍历"
+      function: "Directory.GetFiles("
+      description: "获取目录中的文件，可能存在目录遍历风险"
+      regex: true
+      pattern: "Directory\\.GetFiles\\s*\\("
+      
+    - name: "Directory.GetDirectories目录遍历"
+      function: "Directory.GetDirectories("
+      description: "获取子目录，可能存在目录遍历风险"
+      regex: true
+      pattern: "Directory\\.GetDirectories\\s*\\("
+      
+    - name: "Directory.EnumerateFiles目录遍历"
+      function: "Directory.EnumerateFiles("
+      description: "枚举目录中的文件，可能存在目录遍历风险"
+      regex: true
+      pattern: "Directory\\.EnumerateFiles\\s*\\("
+      
+    - name: "Directory.Delete目录删除"
+      function: "Directory.Delete("
+      description: "删除目录，注意路径验证"
+      regex: true
+      pattern: "Directory\\.Delete\\s*\\("
+      
+    - name: "Directory.Move目录移动"
+      function: "Directory.Move("
+      description: "移动目录，注意路径验证"
+      regex: true
+      pattern: "Directory\\.Move\\s*\\("
+      
+    - name: "Directory.CreateDirectory目录创建"
+      function: "Directory.CreateDirectory("
+      description: "创建目录，注意路径验证"
+      regex: true
+      pattern: "Directory\\.CreateDirectory\\s*\\("
+      
+    - name: "FileStream文件流"
+      function: "FileStream"
+      description: "文件流操作，注意路径验证"
+      regex: true
+      pattern: "new\\s+FileStream\\s*\\("
+      
+    - name: "StreamReader文件读取"
+      function: "StreamReader"
+      description: "流读取器，注意路径验证"
+      regex: true
+      pattern: "new\\s+StreamReader\\s*\\("
+      
+    - name: "StreamWriter文件写入"
+      function: "StreamWriter"
+      description: "流写入器，注意路径验证"
+      regex: true
+      pattern: "new\\s+StreamWriter\\s*\\("
+      
+    - name: "Path.Combine路径组合"
+      function: "Path.Combine("
+      description: "组合路径，注意路径遍历风险"
+      regex: true
+      pattern: "Path\\.Combine\\s*\\("
+      
+    - name: "Path.GetFullPath路径规范化"
+      function: "Path.GetFullPath("
+      description: "获取完整路径，注意路径遍历"
+      regex: true
+      pattern: "Path\\.GetFullPath\\s*\\("
+      
+    - name: "FileInfo文件信息"
+      function: "FileInfo"
+      description: "文件信息操作，注意路径验证"
+      regex: true
+      pattern: "new\\s+FileInfo\\s*\\("
+      
+    - name: "DirectoryInfo目录信息"
+      function: "DirectoryInfo"
+      description: "目录信息操作，注意路径验证"
+      regex: true
+      pattern: "new\\s+DirectoryInfo\\s*\\("
+      
+    - name: "Response.Write输出"
+      function: "Response.Write("
+      description: "HTTP响应输出，可能存在XSS风险"
+      regex: true
+      pattern: "Response\\.Write\\s*\\("
+      
+    - name: "Response.BinaryWrite二进制输出"
+      function: "Response.BinaryWrite("
+      description: "二进制响应输出，注意内容验证"
+      regex: true
+      pattern: "Response\\.BinaryWrite\\s*\\("
+      
+    - name: "Server.Transfer服务器转发"
+      function: "Server.Transfer("
+      description: "服务器端转发，注意路径验证"
+      regex: true
+      pattern: "Server\\.Transfer\\s*\\("
+      
+    - name: "Server.Execute服务器执行"
+      function: "Server.Execute("
+      description: "服务器端执行，注意路径验证"
+      regex: true
+      pattern: "Server\\.Execute\\s*\\("
+      
+    - name: "Request.QueryString查询参数"
+      function: "Request.QueryString"
+      description: "获取查询字符串参数，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "Request\\.QueryString\\["
+      
+    - name: "Request.Form表单参数"
+      function: "Request.Form"
+      description: "获取表单参数，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "Request\\.Form\\["
+      
+    - name: "Request.Cookies Cookie参数"
+      function: "Request.Cookies"
+      description: "获取Cookie参数，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "Request\\.Cookies\\["
+      
+    - name: "Request.Headers请求头"
+      function: "Request.Headers"
+      description: "获取HTTP请求头，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "Request\\.Headers\\["
+      
+    - name: "Request.Params请求参数"
+      function: "Request.Params"
+      description: "获取请求参数，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "Request\\.Params\\["
+      
+    - name: "Server.MapPath路径映射"
+      function: "Server.MapPath("
+      description: "映射虚拟路径到物理路径，注意路径遍历"
+      regex: true
+      pattern: "Server\\.MapPath\\s*\\("
+      
+    - name: "HostingEnvironment.MapPath路径映射"
+      function: "HostingEnvironment.MapPath("
+      description: "映射虚拟路径到物理路径，注意路径遍历"
+      regex: true
+      pattern: "HostingEnvironment\\.MapPath\\s*\\("
+      
+    - name: "RedirectToRoute路由重定向"
+      function: "RedirectToRoute("
+      description: "路由重定向，注意参数验证"
+      regex: true
+      pattern: "RedirectToRoute\\s*\\("
+      
+    - name: "RedirectPermanent永久重定向"
+      function: "RedirectPermanent("
+      description: "永久重定向，可能存在开放重定向漏洞"
+      regex: true
+      pattern: "RedirectPermanent\\s*\\("
+      
+    - name: "TcpClient TCP客户端"
+      function: "TcpClient"
+      description: "TCP客户端连接，可能存在SSRF风险"
+      regex: true
+      pattern: "new\\s+TcpClient\\s*\\("
+      
+    - name: "Socket套接字"
+      function: "Socket"
+      description: "套接字操作，注意网络安全"
+      regex: true
+      pattern: "new\\s+Socket\\s*\\("
+      
+    - name: "FtpWebRequest FTP请求"
+      function: "FtpWebRequest"
+      description: "FTP请求，可能存在SSRF风险"
+      regex: true
+      pattern: "FtpWebRequest"
+      
+    - name: "DES加密"
+      function: "DES.Create("
+      description: "DES加密算法不安全，应使用AES"
+      regex: true
+      pattern: "DES\\.Create\\s*\\("
+      
+    - name: "TripleDES加密"
+      function: "TripleDES.Create("
+      description: "3DES加密算法较弱，建议使用AES"
+      regex: true
+      pattern: "TripleDES\\.Create\\s*\\("
+      
+    - name: "RC2加密"
+      function: "RC2.Create("
+      description: "RC2加密算法不安全，应使用AES"
+      regex: true
+      pattern: "RC2\\.Create\\s*\\("
+      
+    - name: "RijndaelManaged加密"
+      function: "RijndaelManaged"
+      description: "使用Rijndael加密，注意密钥和IV的安全性"
+      regex: true
+      pattern: "new\\s+RijndaelManaged\\s*\\("
+      
+    - name: "AesManaged加密"
+      function: "AesManaged"
+      description: "使用AES加密，注意密钥和IV的安全性"
+      regex: true
+      pattern: "new\\s+AesManaged\\s*\\("
+      
+    - name: "RSACryptoServiceProvider RSA"
+      function: "RSACryptoServiceProvider"
+      description: "RSA加密，注意密钥长度应>=2048位"
+      regex: true
+      pattern: "new\\s+RSACryptoServiceProvider\\s*\\("
+      
+    - name: "FormsAuthentication.SetAuthCookie认证Cookie"
+      function: "FormsAuthentication.SetAuthCookie("
+      description: "设置认证Cookie，注意安全标志"
+      regex: true
+      pattern: "FormsAuthentication\\.SetAuthCookie\\s*\\("
+      
+    - name: "FormsAuthentication.RedirectFromLoginPage登录重定向"
+      function: "FormsAuthentication.RedirectFromLoginPage("
+      description: "登录后重定向，注意开放重定向风险"
+      regex: true
+      pattern: "FormsAuthentication\\.RedirectFromLoginPage\\s*\\("
+
+  low:
+    - name: "Console.WriteLine调试输出"
+      function: "Console.WriteLine("
+      description: "控制台输出，生产环境应使用日志框架"
+      regex: true
+      pattern: "Console\\.WriteLine\\s*\\("
+      
+    - name: "Debug.WriteLine调试输出"
+      function: "Debug.WriteLine("
+      description: "调试输出，生产环境应移除或使用日志"
+      regex: true
+      pattern: "Debug\\.WriteLine\\s*\\("
+      
+    - name: "Trace.WriteLine追踪输出"
+      function: "Trace.WriteLine("
+      description: "追踪输出，生产环境应谨慎使用"
+      regex: true
+      pattern: "Trace\\.WriteLine\\s*\\("
+      
+    - name: "Thread.Sleep线程睡眠"
+      function: "Thread.Sleep("
+      description: "线程睡眠，可能影响性能"
+      regex: true
+      pattern: "Thread\\.Sleep\\s*\\("
+      
+    - name: "GC.Collect垃圾回收"
+      function: "GC.Collect("
+      description: "强制垃圾回收，通常不建议手动调用"
+      regex: true
+      pattern: "GC\\.Collect\\s*\\("
+      
+    - name: "Console.Write调试输出"
+      function: "Console.Write("
+      description: "控制台输出，生产环境应使用日志框架"
+      regex: true
+      pattern: "Console\\.Write\\s*\\("
+      
+    - name: "Console.ReadLine控制台输入"
+      function: "Console.ReadLine("
+      description: "控制台输入，生产环境不应使用"
+      regex: true
+      pattern: "Console\\.ReadLine\\s*\\("
+      
+    - name: "Debug.Write调试输出"
+      function: "Debug.Write("
+      description: "调试输出，生产环境应移除"
+      regex: true
+      pattern: "Debug\\.Write\\s*\\("
+      
+    - name: "Debug.Print调试输出"
+      function: "Debug.Print("
+      description: "调试输出，生产环境应移除"
+      regex: true
+      pattern: "Debug\\.Print\\s*\\("
+      
+    - name: "Trace.Write追踪输出"
+      function: "Trace.Write("
+      description: "追踪输出，生产环境应谨慎使用"
+      regex: true
+      pattern: "Trace\\.Write\\s*\\("
+      
+    - name: "Trace.TraceInformation追踪信息"
+      function: "Trace.TraceInformation("
+      description: "追踪信息输出，生产环境应谨慎使用"
+      regex: true
+      pattern: "Trace\\.TraceInformation\\s*\\("
+      
+    - name: "Trace.TraceWarning追踪警告"
+      function: "Trace.TraceWarning("
+      description: "追踪警告输出"
+      regex: true
+      pattern: "Trace\\.TraceWarning\\s*\\("
+      
+    - name: "Trace.TraceError追踪错误"
+      function: "Trace.TraceError("
+      description: "追踪错误输出"
+      regex: true
+      pattern: "Trace\\.TraceError\\s*\\("
+      
+    - name: "Environment.GetEnvironmentVariable环境变量"
+      function: "Environment.GetEnvironmentVariable("
+      description: "获取环境变量，可能泄露敏感信息"
+      regex: true
+      pattern: "Environment\\.GetEnvironmentVariable\\s*\\("
+      
+    - name: "Environment.GetEnvironmentVariables环境变量"
+      function: "Environment.GetEnvironmentVariables("
+      description: "获取所有环境变量，可能泄露敏感信息"
+      regex: true
+      pattern: "Environment\\.GetEnvironmentVariables\\s*\\("
+      
+    - name: "Environment.SetEnvironmentVariable环境变量"
+      function: "Environment.SetEnvironmentVariable("
+      description: "设置环境变量"
+      regex: true
+      pattern: "Environment\\.SetEnvironmentVariable\\s*\\("
+      
+    - name: "Environment.UserName用户名"
+      function: "Environment.UserName"
+      description: "获取用户名，可能泄露信息"
+      regex: true
+      pattern: "Environment\\.UserName"
+      
+    - name: "Environment.MachineName机器名"
+      function: "Environment.MachineName"
+      description: "获取机器名，可能泄露信息"
+      regex: true
+      pattern: "Environment\\.MachineName"
+      
+    - name: "Environment.OSVersion系统版本"
+      function: "Environment.OSVersion"
+      description: "获取操作系统版本，可能泄露系统信息"
+      regex: true
+      pattern: "Environment\\.OSVersion"
+      
+    - name: "Dns.GetHostName主机名"
+      function: "Dns.GetHostName("
+      description: "获取本地主机名，可能泄露信息"
+      regex: true
+      pattern: "Dns\\.GetHostName\\s*\\("
+      
+    - name: "Dns.GetHostEntry主机信息"
+      function: "Dns.GetHostEntry("
+      description: "获取主机信息，可能泄露网络信息"
+      regex: true
+      pattern: "Dns\\.GetHostEntry\\s*\\("
+      
+    - name: "Assembly.GetExecutingAssembly程序集信息"
+      function: "Assembly.GetExecutingAssembly("
+      description: "获取当前执行的程序集，可能泄露路径信息"
+      regex: true
+      pattern: "Assembly\\.GetExecutingAssembly\\s*\\("
+      
+    - name: "Assembly.GetCallingAssembly程序集信息"
+      function: "Assembly.GetCallingAssembly("
+      description: "获取调用程序集，可能泄露路径信息"
+      regex: true
+      pattern: "Assembly\\.GetCallingAssembly\\s*\\("
+      
+    - name: "Assembly.GetEntryAssembly程序集信息"
+      function: "Assembly.GetEntryAssembly("
+      description: "获取入口程序集，可能泄露路径信息"
+      regex: true
+      pattern: "Assembly\\.GetEntryAssembly\\s*\\("
+      
+    - name: "StackTrace堆栈跟踪"
+      function: "StackTrace"
+      description: "获取堆栈跟踪，可能泄露敏感信息"
+      regex: true
+      pattern: "new\\s+StackTrace\\s*\\("
+      
+    - name: "Exception.StackTrace异常堆栈"
+      function: "Exception.StackTrace"
+      description: "获取异常堆栈跟踪，可能泄露路径信息"
+      regex: true
+      pattern: "\\.StackTrace"
+      
+    - name: "Exception.ToString异常信息"
+      function: "Exception.ToString("
+      description: "异常完整信息，可能泄露敏感数据"
+      regex: true
+      pattern: "Exception.*\\.ToString\\s*\\("
+      
+    - name: "Type.GetType反射类型"
+      function: "Type.GetType("
+      description: "获取类型信息，注意类型名来源"
+      regex: true
+      pattern: "Type\\.GetType\\s*\\("
+      
+    - name: "Assembly.GetType反射类型"
+      function: "Assembly.GetType("
+      description: "从程序集获取类型，注意类型名来源"
+      regex: true
+      pattern: "Assembly.*\\.GetType\\s*\\("
+      
+    - name: "Marshal.PtrToStructure指针转换"
+      function: "Marshal.PtrToStructure("
+      description: "指针转结构，不安全操作"
+      regex: true
+      pattern: "Marshal\\.PtrToStructure\\s*\\("
+      
+    - name: "Marshal.StructureToPtr指针转换"
+      function: "Marshal.StructureToPtr("
+      description: "结构转指针，不安全操作"
+      regex: true
+      pattern: "Marshal\\.StructureToPtr\\s*\\("
+      
+    - name: "GCHandle.Alloc句柄分配"
+      function: "GCHandle.Alloc("
+      description: "分配GC句柄，注意释放"
+      regex: true
+      pattern: "GCHandle\\.Alloc\\s*\\("
+      
+    - name: "Task.Run异步任务"
+      function: "Task.Run("
+      description: "运行异步任务，注意异常处理"
+      regex: true
+      pattern: "Task\\.Run\\s*\\("
+      
+    - name: "Task.Factory.StartNew异步任务"
+      function: "Task.Factory.StartNew("
+      description: "启动新任务，注意异常处理"
+      regex: true
+      pattern: "Task\\.Factory\\.StartNew\\s*\\("
+      
+    - name: "Thread异步线程"
+      function: "Thread"
+      description: "创建线程，注意线程安全和异常处理"
+      regex: true
+      pattern: "new\\s+Thread\\s*\\("
+      
+    - name: "ThreadPool.QueueUserWorkItem线程池"
+      function: "ThreadPool.QueueUserWorkItem("
+      description: "排队工作项到线程池，注意异常处理"
+      regex: true
+      pattern: "ThreadPool\\.QueueUserWorkItem\\s*\\("
+      
+    - name: "Parallel.For并行循环"
+      function: "Parallel.For("
+      description: "并行循环，注意线程安全"
+      regex: true
+      pattern: "Parallel\\.For\\s*\\("
+      
+    - name: "Parallel.ForEach并行遍历"
+      function: "Parallel.ForEach("
+      description: "并行遍历，注意线程安全"
+      regex: true
+      pattern: "Parallel\\.ForEach\\s*\\("
+      
+    - name: "AppDomain.CurrentDomain应用域"
+      function: "AppDomain.CurrentDomain"
+      description: "获取当前应用域"
+      regex: true
+      pattern: "AppDomain\\.CurrentDomain"
+      
+    - name: "ConfigurationManager.AppSettings配置读取"
+      function: "ConfigurationManager.AppSettings"
+      description: "读取应用配置"
+      regex: true
+      pattern: "ConfigurationManager\\.AppSettings\\["
+      
+    - name: "ConfigurationManager.ConnectionStrings连接字符串"
+      function: "ConfigurationManager.ConnectionStrings"
+      description: "读取连接字符串，注意敏感信息保护"
+      regex: true
+      pattern: "ConfigurationManager\\.ConnectionStrings\\["
+      
+    - name: "Registry.GetValue注册表读取"
+      function: "Registry.GetValue("
+      description: "读取注册表值"
+      regex: true
+      pattern: "Registry\\.GetValue\\s*\\("
+      
+    - name: "Registry.SetValue注册表写入"
+      function: "Registry.SetValue("
+      description: "写入注册表值，需要权限"
+      regex: true
+      pattern: "Registry\\.SetValue\\s*\\("
+      
+    - name: "RegistryKey.OpenSubKey注册表操作"
+      function: "RegistryKey.OpenSubKey("
+      description: "打开注册表子键"
+      regex: true
+      pattern: "RegistryKey.*\\.OpenSubKey\\s*\\("
+      
+    - name: "EventLog.WriteEntry事件日志"
+      function: "EventLog.WriteEntry("
+      description: "写入事件日志"
+      regex: true
+      pattern: "EventLog\\.WriteEntry\\s*\\("
+      
+    - name: "PerformanceCounter性能计数器"
+      function: "PerformanceCounter"
+      description: "性能计数器"
+      regex: true
+      pattern: "new\\s+PerformanceCounter\\s*\\("
+      
+    - name: "Debugger.IsAttached调试器检测"
+      function: "Debugger.IsAttached"
+      description: "检测是否附加调试器"
+      regex: true
+      pattern: "Debugger\\.IsAttached"
+      
+    - name: "Debugger.Launch调试器启动"
+      function: "Debugger.Launch("
+      description: "启动调试器"
+      regex: true
+      pattern: "Debugger\\.Launch\\s*\\("
+      
+    - name: "Application.ExecutablePath应用路径"
+      function: "Application.ExecutablePath"
+      description: "获取可执行文件路径，可能泄露路径信息"
+      regex: true
+      pattern: "Application\\.ExecutablePath"
+      
+    - name: "Application.StartupPath启动路径"
+      function: "Application.StartupPath"
+      description: "获取应用启动路径，可能泄露路径信息"
+      regex: true
+      pattern: "Application\\.StartupPath"
+

@@ -1,0 +1,1203 @@
+language: Python
+version: "1.0"
+description: "Python代码审计规则集"
+
+rules:
+  critical:
+    - name: "eval函数"
+      function: "eval("
+      description: "执行Python表达式，可能存在代码注入风险"
+      regex: true
+      pattern: "eval\\s*\\("
+      
+    - name: "exec函数"
+      function: "exec("
+      description: "执行Python代码，可能存在代码注入风险"
+      regex: true
+      pattern: "exec\\s*\\("
+      
+    - name: "compile函数"
+      function: "compile("
+      description: "编译Python代码，可能存在代码注入风险"
+      regex: true
+      pattern: "compile\\s*\\("
+      
+    - name: "os.system命令执行"
+      function: "os.system("
+      description: "执行系统命令，可能存在命令注入风险"
+      regex: true
+      pattern: "os\\.system\\s*\\("
+      
+    - name: "os.popen命令执行"
+      function: "os.popen("
+      description: "执行系统命令并返回文件对象，可能存在命令注入风险"
+      regex: true
+      pattern: "os\\.popen\\s*\\("
+      
+    - name: "subprocess.call命令执行"
+      function: "subprocess.call("
+      description: "执行系统命令，如使用shell=True可能存在命令注入风险"
+      regex: true
+      pattern: "subprocess\\.call\\s*\\("
+      
+    - name: "subprocess.run命令执行"
+      function: "subprocess.run("
+      description: "执行系统命令，如使用shell=True可能存在命令注入风险"
+      regex: true
+      pattern: "subprocess\\.run\\s*\\("
+      
+    - name: "subprocess.Popen命令执行"
+      function: "subprocess.Popen("
+      description: "执行系统命令，如使用shell=True可能存在命令注入风险"
+      regex: true
+      pattern: "subprocess\\.Popen\\s*\\("
+      
+    - name: "__import__动态导入"
+      function: "__import__("
+      description: "动态导入模块，可能导入恶意模块"
+      regex: true
+      pattern: "__import__\\s*\\("
+      
+    - name: "importlib.import_module动态导入"
+      function: "importlib.import_module("
+      description: "动态导入模块，可能导入恶意模块"
+      regex: true
+      pattern: "importlib\\.import_module\\s*\\("
+      
+    - name: "subprocess.check_output命令执行"
+      function: "subprocess.check_output("
+      description: "执行命令并返回输出，使用shell=True可能存在命令注入"
+      regex: true
+      pattern: "subprocess\\.check_output\\s*\\("
+      
+    - name: "subprocess.check_call命令执行"
+      function: "subprocess.check_call("
+      description: "执行命令并检查返回码，使用shell=True可能存在命令注入"
+      regex: true
+      pattern: "subprocess\\.check_call\\s*\\("
+      
+    - name: "subprocess.getoutput命令执行"
+      function: "subprocess.getoutput("
+      description: "执行shell命令并返回输出，存在命令注入风险"
+      regex: true
+      pattern: "subprocess\\.getoutput\\s*\\("
+      
+    - name: "subprocess.getstatusoutput命令执行"
+      function: "subprocess.getstatusoutput("
+      description: "执行shell命令，存在命令注入风险"
+      regex: true
+      pattern: "subprocess\\.getstatusoutput\\s*\\("
+      
+    - name: "commands.getoutput命令执行"
+      function: "commands.getoutput("
+      description: "执行shell命令（Python2已废弃），存在命令注入风险"
+      regex: true
+      pattern: "commands\\.getoutput\\s*\\("
+      
+    - name: "commands.getstatusoutput命令执行"
+      function: "commands.getstatusoutput("
+      description: "执行shell命令（Python2已废弃），存在命令注入风险"
+      regex: true
+      pattern: "commands\\.getstatusoutput\\s*\\("
+      
+    - name: "os.execl系统调用"
+      function: "os.execl("
+      description: "执行程序，可能存在命令注入风险"
+      regex: true
+      pattern: "os\\.execl\\s*\\("
+      
+    - name: "os.execlp系统调用"
+      function: "os.execlp("
+      description: "执行程序（搜索PATH），可能存在命令注入风险"
+      regex: true
+      pattern: "os\\.execlp\\s*\\("
+      
+    - name: "os.execv系统调用"
+      function: "os.execv("
+      description: "执行程序，可能存在命令注入风险"
+      regex: true
+      pattern: "os\\.execv\\s*\\("
+      
+    - name: "os.execvp系统调用"
+      function: "os.execvp("
+      description: "执行程序（搜索PATH），可能存在命令注入风险"
+      regex: true
+      pattern: "os\\.execvp\\s*\\("
+      
+    - name: "os.spawnl进程创建"
+      function: "os.spawnl("
+      description: "创建新进程，可能存在命令注入风险"
+      regex: true
+      pattern: "os\\.spawnl\\s*\\("
+      
+    - name: "os.spawnv进程创建"
+      function: "os.spawnv("
+      description: "创建新进程，可能存在命令注入风险"
+      regex: true
+      pattern: "os\\.spawnv\\s*\\("
+      
+    - name: "code.interact交互式解释器"
+      function: "code.interact("
+      description: "启动交互式Python解释器，可能执行任意代码"
+      regex: true
+      pattern: "code\\.interact\\s*\\("
+      
+    - name: "code.compile_command编译代码"
+      function: "code.compile_command("
+      description: "编译Python代码，可能存在代码注入风险"
+      regex: true
+      pattern: "code\\.compile_command\\s*\\("
+      
+    - name: "timeit.timeit代码执行"
+      function: "timeit.timeit("
+      description: "执行代码片段，可能存在代码注入风险"
+      regex: true
+      pattern: "timeit\\.timeit\\s*\\("
+      
+    - name: "timeit.repeat代码执行"
+      function: "timeit.repeat("
+      description: "重复执行代码，可能存在代码注入风险"
+      regex: true
+      pattern: "timeit\\.repeat\\s*\\("
+
+  high:
+    - name: "pickle.loads反序列化"
+      function: "pickle.loads("
+      description: "pickle反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "pickle\\.loads\\s*\\("
+      
+    - name: "pickle.load反序列化"
+      function: "pickle.load("
+      description: "pickle反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "pickle\\.load\\s*\\("
+      
+    - name: "yaml.load反序列化"
+      function: "yaml.load("
+      description: "YAML反序列化，不使用safe_load可能存在代码执行风险"
+      regex: true
+      pattern: "yaml\\.load\\s*\\("
+      
+    - name: "marshal.loads反序列化"
+      function: "marshal.loads("
+      description: "marshal反序列化，可能存在安全风险"
+      regex: true
+      pattern: "marshal\\.loads\\s*\\("
+      
+    - name: "shelve模块"
+      function: "shelve.open("
+      description: "shelve使用pickle序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "shelve\\.open\\s*\\("
+      
+    - name: "SQL注入cursor.execute"
+      function: "cursor.execute("
+      description: "执行SQL语句，字符串拼接可能存在SQL注入风险"
+      regex: true
+      pattern: "cursor\\.execute\\s*\\("
+      
+    - name: "SQL注入execute"
+      function: ".execute("
+      description: "执行SQL语句，字符串拼接可能存在SQL注入风险"
+      regex: true
+      pattern: "\\.execute\\s*\\("
+      
+    - name: "SQL注入executemany"
+      function: ".executemany("
+      description: "批量执行SQL语句，字符串拼接可能存在SQL注入风险"
+      regex: true
+      pattern: "\\.executemany\\s*\\("
+      
+    - name: "XML解析etree.parse"
+      function: "etree.parse("
+      description: "XML解析，可能存在XXE漏洞"
+      regex: true
+      pattern: "etree\\.parse\\s*\\("
+      
+    - name: "XML解析ElementTree.parse"
+      function: "ElementTree.parse("
+      description: "XML解析，可能存在XXE漏洞"
+      regex: true
+      pattern: "ElementTree\\.parse\\s*\\("
+      
+    - name: "SSRF requests.get"
+      function: "requests.get("
+      description: "HTTP GET请求，未验证URL可能存在SSRF风险"
+      regex: true
+      pattern: "requests\\.get\\s*\\("
+      
+    - name: "SSRF requests.post"
+      function: "requests.post("
+      description: "HTTP POST请求，未验证URL可能存在SSRF风险"
+      regex: true
+      pattern: "requests\\.post\\s*\\("
+      
+    - name: "SSRF urllib.request.urlopen"
+      function: "urllib.request.urlopen("
+      description: "打开URL，可能存在SSRF风险"
+      regex: true
+      pattern: "urllib\\.request\\.urlopen\\s*\\("
+      
+    - name: "input用户输入"
+      function: "input("
+      description: "获取用户输入，注意输入验证"
+      regex: true
+      pattern: "input\\s*\\("
+      
+    - name: "cPickle.loads反序列化"
+      function: "cPickle.loads("
+      description: "cPickle反序列化（Python2），可能存在反序列化漏洞"
+      regex: true
+      pattern: "cPickle\\.loads\\s*\\("
+      
+    - name: "cPickle.load反序列化"
+      function: "cPickle.load("
+      description: "cPickle反序列化（Python2），可能存在反序列化漏洞"
+      regex: true
+      pattern: "cPickle\\.load\\s*\\("
+      
+    - name: "dill.loads反序列化"
+      function: "dill.loads("
+      description: "dill反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "dill\\.loads\\s*\\("
+      
+    - name: "dill.load反序列化"
+      function: "dill.load("
+      description: "dill反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "dill\\.load\\s*\\("
+      
+    - name: "jsonpickle.decode反序列化"
+      function: "jsonpickle.decode("
+      description: "jsonpickle反序列化，可能存在反序列化漏洞"
+      regex: true
+      pattern: "jsonpickle\\.decode\\s*\\("
+      
+    - name: "yaml.unsafe_load反序列化"
+      function: "yaml.unsafe_load("
+      description: "YAML不安全加载，存在代码执行风险"
+      regex: true
+      pattern: "yaml\\.unsafe_load\\s*\\("
+      
+    - name: "yaml.full_load反序列化"
+      function: "yaml.full_load("
+      description: "YAML完整加载，注意安全性"
+      regex: true
+      pattern: "yaml\\.full_load\\s*\\("
+      
+    - name: "ruamel.yaml.load反序列化"
+      function: "ruamel.yaml.load("
+      description: "ruamel YAML加载，注意安全配置"
+      regex: true
+      pattern: "ruamel\\.yaml\\.load\\s*\\("
+      
+    - name: "marshal.load反序列化"
+      function: "marshal.load("
+      description: "marshal反序列化，可能存在安全风险"
+      regex: true
+      pattern: "marshal\\.load\\s*\\("
+      
+    - name: "minidom.parseString XML解析"
+      function: "minidom.parseString("
+      description: "XML解析，可能存在XXE漏洞"
+      regex: true
+      pattern: "minidom\\.parseString\\s*\\("
+      
+    - name: "minidom.parse XML解析"
+      function: "minidom.parse("
+      description: "XML解析，可能存在XXE漏洞"
+      regex: true
+      pattern: "minidom\\.parse\\s*\\("
+      
+    - name: "pulldom.parseString XML解析"
+      function: "pulldom.parseString("
+      description: "XML解析，可能存在XXE漏洞"
+      regex: true
+      pattern: "pulldom\\.parseString\\s*\\("
+      
+    - name: "sax.parseString XML解析"
+      function: "sax.parseString("
+      description: "SAX解析XML，可能存在XXE漏洞"
+      regex: true
+      pattern: "sax\\.parseString\\s*\\("
+      
+    - name: "defusedxml.expatreader XML解析"
+      function: "expatreader.create_parser("
+      description: "XML解析器创建"
+      regex: true
+      pattern: "expatreader\\.create_parser\\s*\\("
+      
+    - name: "lxml.etree.fromstring XML解析"
+      function: "etree.fromstring("
+      description: "从字符串解析XML，可能存在XXE漏洞"
+      regex: true
+      pattern: "etree\\.fromstring\\s*\\("
+      
+    - name: "lxml.etree.XMLParser XML解析器"
+      function: "etree.XMLParser("
+      description: "创建XML解析器，注意XXE配置"
+      regex: true
+      pattern: "etree\\.XMLParser\\s*\\("
+      
+    - name: "requests.request HTTP请求"
+      function: "requests.request("
+      description: "HTTP请求，未验证URL可能存在SSRF风险"
+      regex: true
+      pattern: "requests\\.request\\s*\\("
+      
+    - name: "requests.put HTTP请求"
+      function: "requests.put("
+      description: "HTTP PUT请求，未验证URL可能存在SSRF风险"
+      regex: true
+      pattern: "requests\\.put\\s*\\("
+      
+    - name: "requests.delete HTTP请求"
+      function: "requests.delete("
+      description: "HTTP DELETE请求，未验证URL可能存在SSRF风险"
+      regex: true
+      pattern: "requests\\.delete\\s*\\("
+      
+    - name: "requests.head HTTP请求"
+      function: "requests.head("
+      description: "HTTP HEAD请求，未验证URL可能存在SSRF风险"
+      regex: true
+      pattern: "requests\\.head\\s*\\("
+      
+    - name: "requests.patch HTTP请求"
+      function: "requests.patch("
+      description: "HTTP PATCH请求，未验证URL可能存在SSRF风险"
+      regex: true
+      pattern: "requests\\.patch\\s*\\("
+      
+    - name: "urllib.urlopen URL打开"
+      function: "urllib.urlopen("
+      description: "打开URL（Python2），可能存在SSRF风险"
+      regex: true
+      pattern: "urllib\\.urlopen\\s*\\("
+      
+    - name: "urllib2.urlopen URL打开"
+      function: "urllib2.urlopen("
+      description: "打开URL（Python2），可能存在SSRF风险"
+      regex: true
+      pattern: "urllib2\\.urlopen\\s*\\("
+      
+    - name: "urllib3.request HTTP请求"
+      function: "urllib3.request("
+      description: "urllib3 HTTP请求，可能存在SSRF风险"
+      regex: true
+      pattern: "urllib3\\.request\\s*\\("
+      
+    - name: "httplib.HTTPConnection HTTP连接"
+      function: "httplib.HTTPConnection("
+      description: "HTTP连接（Python2），可能存在SSRF风险"
+      regex: true
+      pattern: "httplib\\.HTTPConnection\\s*\\("
+      
+    - name: "http.client.HTTPConnection HTTP连接"
+      function: "http.client.HTTPConnection("
+      description: "HTTP连接，可能存在SSRF风险"
+      regex: true
+      pattern: "http\\.client\\.HTTPConnection\\s*\\("
+      
+    - name: "ftplib.FTP FTP连接"
+      function: "ftplib.FTP("
+      description: "FTP连接，可能存在SSRF风险"
+      regex: true
+      pattern: "ftplib\\.FTP\\s*\\("
+      
+    - name: "smtplib.SMTP SMTP连接"
+      function: "smtplib.SMTP("
+      description: "SMTP连接，可能存在邮件头注入"
+      regex: true
+      pattern: "smtplib\\.SMTP\\s*\\("
+      
+    - name: "telnetlib.Telnet Telnet连接"
+      function: "telnetlib.Telnet("
+      description: "Telnet连接，可能存在SSRF风险"
+      regex: true
+      pattern: "telnetlib\\.Telnet\\s*\\("
+      
+    - name: "ldap.initialize LDAP连接"
+      function: "ldap.initialize("
+      description: "LDAP初始化，可能存在LDAP注入"
+      regex: true
+      pattern: "ldap\\.initialize\\s*\\("
+      
+    - name: "ldap3.Connection LDAP连接"
+      function: "ldap3.Connection("
+      description: "LDAP3连接，可能存在LDAP注入"
+      regex: true
+      pattern: "ldap3\\.Connection\\s*\\("
+      
+    - name: "pymongo.MongoClient MongoDB连接"
+      function: "pymongo.MongoClient("
+      description: "MongoDB连接，注意NoSQL注入"
+      regex: true
+      pattern: "pymongo\\.MongoClient\\s*\\("
+      
+    - name: "redis.Redis Redis连接"
+      function: "redis.Redis("
+      description: "Redis连接，注意命令注入"
+      regex: true
+      pattern: "redis\\.Redis\\s*\\("
+      
+    - name: "redis.StrictRedis Redis连接"
+      function: "redis.StrictRedis("
+      description: "Redis严格连接，注意命令注入"
+      regex: true
+      pattern: "redis\\.StrictRedis\\s*\\("
+
+  medium:
+    - name: "open文件操作"
+      function: "open("
+      description: "打开文件，注意路径验证防止路径遍历"
+      regex: true
+      pattern: "open\\s*\\("
+      
+    - name: "文件读取read"
+      function: ".read("
+      description: "读取文件内容"
+      regex: true
+      pattern: "\\.read\\s*\\("
+      
+    - name: "文件写入write"
+      function: ".write("
+      description: "写入文件内容，注意文件名验证"
+      regex: true
+      pattern: "\\.write\\s*\\("
+      
+    - name: "os.path.join路径拼接"
+      function: "os.path.join("
+      description: "路径拼接，注意路径遍历风险"
+      regex: true
+      pattern: "os\\.path\\.join\\s*\\("
+      
+    - name: "shutil.copy文件复制"
+      function: "shutil.copy("
+      description: "复制文件，注意路径验证"
+      regex: true
+      pattern: "shutil\\.copy\\s*\\("
+      
+    - name: "shutil.move文件移动"
+      function: "shutil.move("
+      description: "移动文件，注意路径验证"
+      regex: true
+      pattern: "shutil\\.move\\s*\\("
+      
+    - name: "os.remove文件删除"
+      function: "os.remove("
+      description: "删除文件，注意路径验证"
+      regex: true
+      pattern: "os\\.remove\\s*\\("
+      
+    - name: "Flask render_template_string"
+      function: "render_template_string("
+      description: "渲染模板字符串，可能存在SSTI漏洞"
+      regex: true
+      pattern: "render_template_string\\s*\\("
+      
+    - name: "Jinja2模板"
+      function: "Template("
+      description: "Jinja2模板，不当使用可能存在SSTI漏洞"
+      regex: true
+      pattern: "Template\\s*\\("
+      
+    - name: "Django raw SQL"
+      function: ".raw("
+      description: "执行原始SQL，注意SQL注入风险"
+      regex: true
+      pattern: "\\.raw\\s*\\("
+      
+    - name: "Django extra查询"
+      function: ".extra("
+      description: "附加SQL子句，注意SQL注入风险"
+      regex: true
+      pattern: "\\.extra\\s*\\("
+      
+    - name: "Cookie操作set_cookie"
+      function: "set_cookie("
+      description: "设置Cookie，注意httponly和secure标志"
+      regex: true
+      pattern: "set_cookie\\s*\\("
+      
+    - name: "随机数random"
+      function: "random."
+      description: "random模块不适合加密场景，应使用secrets模块"
+      regex: true
+      pattern: "random\\."
+      
+    - name: "MD5哈希"
+      function: "hashlib.md5("
+      description: "MD5算法不安全，不应用于密码哈希"
+      regex: true
+      pattern: "hashlib\\.md5\\s*\\("
+      
+    - name: "SHA1哈希"
+      function: "hashlib.sha1("
+      description: "SHA1算法不安全，不应用于密码哈希"
+      regex: true
+      pattern: "hashlib\\.sha1\\s*\\("
+      
+    - name: "os.listdir目录列表"
+      function: "os.listdir("
+      description: "列出目录内容，可能存在目录遍历风险"
+      regex: true
+      pattern: "os\\.listdir\\s*\\("
+      
+    - name: "os.walk目录遍历"
+      function: "os.walk("
+      description: "遍历目录树，可能存在目录遍历风险"
+      regex: true
+      pattern: "os\\.walk\\s*\\("
+      
+    - name: "os.scandir目录扫描"
+      function: "os.scandir("
+      description: "扫描目录，可能存在目录遍历风险"
+      regex: true
+      pattern: "os\\.scandir\\s*\\("
+      
+    - name: "os.mkdir目录创建"
+      function: "os.mkdir("
+      description: "创建目录，注意路径验证"
+      regex: true
+      pattern: "os\\.mkdir\\s*\\("
+      
+    - name: "os.makedirs目录创建"
+      function: "os.makedirs("
+      description: "递归创建目录，注意路径验证"
+      regex: true
+      pattern: "os\\.makedirs\\s*\\("
+      
+    - name: "os.rmdir目录删除"
+      function: "os.rmdir("
+      description: "删除目录，注意路径验证"
+      regex: true
+      pattern: "os\\.rmdir\\s*\\("
+      
+    - name: "os.removedirs目录删除"
+      function: "os.removedirs("
+      description: "递归删除目录，注意路径验证"
+      regex: true
+      pattern: "os\\.removedirs\\s*\\("
+      
+    - name: "os.rename文件重命名"
+      function: "os.rename("
+      description: "重命名文件或目录，注意路径验证"
+      regex: true
+      pattern: "os\\.rename\\s*\\("
+      
+    - name: "os.renames文件重命名"
+      function: "os.renames("
+      description: "递归重命名，注意路径验证"
+      regex: true
+      pattern: "os\\.renames\\s*\\("
+      
+    - name: "os.unlink文件删除"
+      function: "os.unlink("
+      description: "删除文件（同os.remove），注意路径验证"
+      regex: true
+      pattern: "os\\.unlink\\s*\\("
+      
+    - name: "os.chmod文件权限"
+      function: "os.chmod("
+      description: "修改文件权限"
+      regex: true
+      pattern: "os\\.chmod\\s*\\("
+      
+    - name: "os.chown文件所有者"
+      function: "os.chown("
+      description: "修改文件所有者"
+      regex: true
+      pattern: "os\\.chown\\s*\\("
+      
+    - name: "shutil.rmtree目录删除"
+      function: "shutil.rmtree("
+      description: "删除整个目录树，注意路径验证"
+      regex: true
+      pattern: "shutil\\.rmtree\\s*\\("
+      
+    - name: "shutil.copytree目录复制"
+      function: "shutil.copytree("
+      description: "复制整个目录树，注意路径验证"
+      regex: true
+      pattern: "shutil\\.copytree\\s*\\("
+      
+    - name: "shutil.copy2文件复制"
+      function: "shutil.copy2("
+      description: "复制文件（保留元数据），注意路径验证"
+      regex: true
+      pattern: "shutil\\.copy2\\s*\\("
+      
+    - name: "shutil.copyfile文件复制"
+      function: "shutil.copyfile("
+      description: "复制文件内容，注意路径验证"
+      regex: true
+      pattern: "shutil\\.copyfile\\s*\\("
+      
+    - name: "pathlib.Path路径操作"
+      function: "pathlib.Path("
+      description: "路径对象，注意路径遍历"
+      regex: true
+      pattern: "pathlib\\.Path\\s*\\("
+      
+    - name: "Path.read_text文件读取"
+      function: ".read_text("
+      description: "读取文件文本，注意路径验证"
+      regex: true
+      pattern: "\\.read_text\\s*\\("
+      
+    - name: "Path.read_bytes文件读取"
+      function: ".read_bytes("
+      description: "读取文件字节，注意路径验证"
+      regex: true
+      pattern: "\\.read_bytes\\s*\\("
+      
+    - name: "Path.write_text文件写入"
+      function: ".write_text("
+      description: "写入文件文本，注意路径验证"
+      regex: true
+      pattern: "\\.write_text\\s*\\("
+      
+    - name: "Path.write_bytes文件写入"
+      function: ".write_bytes("
+      description: "写入文件字节，注意路径验证"
+      regex: true
+      pattern: "\\.write_bytes\\s*\\("
+      
+    - name: "tarfile.open TAR文件"
+      function: "tarfile.open("
+      description: "打开TAR文件，注意路径遍历（Tar Slip）"
+      regex: true
+      pattern: "tarfile\\.open\\s*\\("
+      
+    - name: "zipfile.ZipFile ZIP文件"
+      function: "zipfile.ZipFile("
+      description: "ZIP文件操作，注意路径遍历（Zip Slip）"
+      regex: true
+      pattern: "zipfile\\.ZipFile\\s*\\("
+      
+    - name: "gzip.open GZIP文件"
+      function: "gzip.open("
+      description: "打开GZIP文件"
+      regex: true
+      pattern: "gzip\\.open\\s*\\("
+      
+    - name: "bz2.open BZ2文件"
+      function: "bz2.open("
+      description: "打开BZ2文件"
+      regex: true
+      pattern: "bz2\\.open\\s*\\("
+      
+    - name: "tempfile.mktemp临时文件"
+      function: "tempfile.mktemp("
+      description: "创建临时文件名（不安全，已废弃），存在竞态条件"
+      regex: true
+      pattern: "tempfile\\.mktemp\\s*\\("
+      
+    - name: "tempfile.mkstemp临时文件"
+      function: "tempfile.mkstemp("
+      description: "创建临时文件"
+      regex: true
+      pattern: "tempfile\\.mkstemp\\s*\\("
+      
+    - name: "tempfile.mkdtemp临时目录"
+      function: "tempfile.mkdtemp("
+      description: "创建临时目录"
+      regex: true
+      pattern: "tempfile\\.mkdtemp\\s*\\("
+      
+    - name: "tempfile.NamedTemporaryFile临时文件"
+      function: "tempfile.NamedTemporaryFile("
+      description: "创建命名临时文件"
+      regex: true
+      pattern: "tempfile\\.NamedTemporaryFile\\s*\\("
+      
+    - name: "Flask redirect重定向"
+      function: "redirect("
+      description: "Flask重定向，可能存在开放重定向漏洞"
+      regex: true
+      pattern: "redirect\\s*\\("
+      
+    - name: "Flask url_for URL生成"
+      function: "url_for("
+      description: "Flask URL生成"
+      regex: true
+      pattern: "url_for\\s*\\("
+      
+    - name: "Django redirect重定向"
+      function: "HttpResponseRedirect("
+      description: "Django重定向，可能存在开放重定向漏洞"
+      regex: true
+      pattern: "HttpResponseRedirect\\s*\\("
+      
+    - name: "Django render渲染"
+      function: "render("
+      description: "Django渲染模板"
+      regex: true
+      pattern: "render\\s*\\("
+      
+    - name: "Django render_to_response渲染"
+      function: "render_to_response("
+      description: "Django渲染模板（已废弃）"
+      regex: true
+      pattern: "render_to_response\\s*\\("
+      
+    - name: "Jinja2 Environment模板"
+      function: "Environment("
+      description: "Jinja2环境，注意SSTI配置"
+      regex: true
+      pattern: "Environment\\s*\\("
+      
+    - name: "Mako Template模板"
+      function: "mako.template.Template("
+      description: "Mako模板，可能存在SSTI漏洞"
+      regex: true
+      pattern: "mako\\.template\\.Template\\s*\\("
+      
+    - name: "tornado.template.Template模板"
+      function: "tornado.template.Template("
+      description: "Tornado模板"
+      regex: true
+      pattern: "tornado\\.template\\.Template\\s*\\("
+      
+    - name: "socket.socket套接字"
+      function: "socket.socket("
+      description: "创建套接字，注意网络安全"
+      regex: true
+      pattern: "socket\\.socket\\s*\\("
+      
+    - name: "socket.create_connection套接字连接"
+      function: "socket.create_connection("
+      description: "创建TCP连接，可能存在SSRF风险"
+      regex: true
+      pattern: "socket\\.create_connection\\s*\\("
+      
+    - name: "socketserver.TCPServer TCP服务器"
+      function: "socketserver.TCPServer("
+      description: "TCP服务器"
+      regex: true
+      pattern: "socketserver\\.TCPServer\\s*\\("
+      
+    - name: "socketserver.UDPServer UDP服务器"
+      function: "socketserver.UDPServer("
+      description: "UDP服务器"
+      regex: true
+      pattern: "socketserver\\.UDPServer\\s*\\("
+      
+    - name: "ssl.wrap_socket SSL封装"
+      function: "ssl.wrap_socket("
+      description: "SSL套接字封装，注意证书验证"
+      regex: true
+      pattern: "ssl\\.wrap_socket\\s*\\("
+      
+    - name: "ssl.SSLContext SSL上下文"
+      function: "ssl.SSLContext("
+      description: "SSL上下文，注意安全配置"
+      regex: true
+      pattern: "ssl\\.SSLContext\\s*\\("
+      
+    - name: "Crypto.Cipher加密"
+      function: "Crypto.Cipher"
+      description: "pycrypto加密，注意使用安全算法"
+      regex: true
+      pattern: "Crypto\\.Cipher"
+      
+    - name: "Cryptodome.Cipher加密"
+      function: "Cryptodome.Cipher"
+      description: "pycryptodome加密，注意使用安全算法"
+      regex: true
+      pattern: "Cryptodome\\.Cipher"
+      
+    - name: "cryptography.hazmat危险材料"
+      function: "cryptography.hazmat"
+      description: "cryptography危险材料层，需要专业知识"
+      regex: true
+      pattern: "cryptography\\.hazmat"
+      
+    - name: "jwt.decode JWT解码"
+      function: "jwt.decode("
+      description: "JWT解码，注意验证签名"
+      regex: true
+      pattern: "jwt\\.decode\\s*\\("
+      
+    - name: "base64.b64decode Base64解码"
+      function: "base64.b64decode("
+      description: "Base64解码，注意数据验证"
+      regex: true
+      pattern: "base64\\.b64decode\\s*\\("
+      
+    - name: "json.loads JSON解析"
+      function: "json.loads("
+      description: "JSON解析"
+      regex: true
+      pattern: "json\\.loads\\s*\\("
+      
+    - name: "ast.literal_eval字面量求值"
+      function: "ast.literal_eval("
+      description: "字面量求值，相对安全但仍需验证"
+      regex: true
+      pattern: "ast\\.literal_eval\\s*\\("
+
+  low:
+    - name: "print调试输出"
+      function: "print("
+      description: "打印输出，生产环境应使用日志"
+      regex: true
+      pattern: "print\\s*\\("
+      
+    - name: "pprint调试输出"
+      function: "pprint("
+      description: "美化打印，生产环境应使用日志"
+      regex: true
+      pattern: "pprint\\s*\\("
+      
+    - name: "assert断言"
+      function: "assert "
+      description: "断言可被-O参数禁用，不应用于安全检查"
+      regex: true
+      pattern: "assert\\s+"
+      
+    - name: "time.sleep睡眠"
+      function: "time.sleep("
+      description: "线程睡眠，可能影响性能"
+      regex: true
+      pattern: "time\\.sleep\\s*\\("
+      
+    - name: "DEBUG模式"
+      function: "DEBUG = True"
+      description: "调试模式，生产环境应设为False"
+      regex: true
+      pattern: "DEBUG\\s*=\\s*True"
+      
+    - name: "logging.debug日志调试"
+      function: "logging.debug("
+      description: "调试日志，注意敏感信息"
+      regex: true
+      pattern: "logging\\.debug\\s*\\("
+      
+    - name: "logging.info日志信息"
+      function: "logging.info("
+      description: "信息日志，注意敏感信息"
+      regex: true
+      pattern: "logging\\.info\\s*\\("
+      
+    - name: "logging.warning日志警告"
+      function: "logging.warning("
+      description: "警告日志"
+      regex: true
+      pattern: "logging\\.warning\\s*\\("
+      
+    - name: "logging.error日志错误"
+      function: "logging.error("
+      description: "错误日志，注意敏感信息"
+      regex: true
+      pattern: "logging\\.error\\s*\\("
+      
+    - name: "logger.debug日志调试"
+      function: "logger.debug("
+      description: "调试日志，注意敏感信息"
+      regex: true
+      pattern: "logger\\.debug\\s*\\("
+      
+    - name: "logger.info日志信息"
+      function: "logger.info("
+      description: "信息日志，注意敏感信息"
+      regex: true
+      pattern: "logger\\.info\\s*\\("
+      
+    - name: "logger.warning日志警告"
+      function: "logger.warning("
+      description: "警告日志"
+      regex: true
+      pattern: "logger\\.warning\\s*\\("
+      
+    - name: "logger.error日志错误"
+      function: "logger.error("
+      description: "错误日志，注意敏感信息"
+      regex: true
+      pattern: "logger\\.error\\s*\\("
+      
+    - name: "traceback.print_exc异常追踪"
+      function: "traceback.print_exc("
+      description: "打印异常追踪，可能泄露路径信息"
+      regex: true
+      pattern: "traceback\\.print_exc\\s*\\("
+      
+    - name: "traceback.format_exc异常格式化"
+      function: "traceback.format_exc("
+      description: "格式化异常追踪，可能泄露路径信息"
+      regex: true
+      pattern: "traceback\\.format_exc\\s*\\("
+      
+    - name: "traceback.print_stack堆栈追踪"
+      function: "traceback.print_stack("
+      description: "打印堆栈追踪，可能泄露路径信息"
+      regex: true
+      pattern: "traceback\\.print_stack\\s*\\("
+      
+    - name: "sys.exc_info异常信息"
+      function: "sys.exc_info("
+      description: "获取异常信息，可能泄露敏感信息"
+      regex: true
+      pattern: "sys\\.exc_info\\s*\\("
+      
+    - name: "sys.argv命令行参数"
+      function: "sys.argv"
+      description: "命令行参数，注意参数验证"
+      regex: true
+      pattern: "sys\\.argv"
+      
+    - name: "sys.path路径操作"
+      function: "sys.path"
+      description: "Python路径，注意路径注入"
+      regex: true
+      pattern: "sys\\.path"
+      
+    - name: "sys.exit程序退出"
+      function: "sys.exit("
+      description: "退出程序"
+      regex: true
+      pattern: "sys\\.exit\\s*\\("
+      
+    - name: "os.environ环境变量"
+      function: "os.environ"
+      description: "环境变量，可能泄露敏感信息"
+      regex: true
+      pattern: "os\\.environ"
+      
+    - name: "os.getenv环境变量"
+      function: "os.getenv("
+      description: "获取环境变量，可能泄露敏感信息"
+      regex: true
+      pattern: "os\\.getenv\\s*\\("
+      
+    - name: "os.putenv环境变量"
+      function: "os.putenv("
+      description: "设置环境变量"
+      regex: true
+      pattern: "os\\.putenv\\s*\\("
+      
+    - name: "os.getcwd当前目录"
+      function: "os.getcwd("
+      description: "获取当前工作目录，可能泄露路径信息"
+      regex: true
+      pattern: "os\\.getcwd\\s*\\("
+      
+    - name: "os.chdir目录切换"
+      function: "os.chdir("
+      description: "切换工作目录"
+      regex: true
+      pattern: "os\\.chdir\\s*\\("
+      
+    - name: "os.getpid进程ID"
+      function: "os.getpid("
+      description: "获取进程ID"
+      regex: true
+      pattern: "os\\.getpid\\s*\\("
+      
+    - name: "os.getppid父进程ID"
+      function: "os.getppid("
+      description: "获取父进程ID"
+      regex: true
+      pattern: "os\\.getppid\\s*\\("
+      
+    - name: "os.getuid用户ID"
+      function: "os.getuid("
+      description: "获取用户ID"
+      regex: true
+      pattern: "os\\.getuid\\s*\\("
+      
+    - name: "os.getgid组ID"
+      function: "os.getgid("
+      description: "获取组ID"
+      regex: true
+      pattern: "os\\.getgid\\s*\\("
+      
+    - name: "os.uname系统信息"
+      function: "os.uname("
+      description: "获取系统信息，可能泄露系统信息"
+      regex: true
+      pattern: "os\\.uname\\s*\\("
+      
+    - name: "platform.system系统信息"
+      function: "platform.system("
+      description: "获取系统名称，可能泄露系统信息"
+      regex: true
+      pattern: "platform\\.system\\s*\\("
+      
+    - name: "platform.release系统版本"
+      function: "platform.release("
+      description: "获取系统版本，可能泄露系统信息"
+      regex: true
+      pattern: "platform\\.release\\s*\\("
+      
+    - name: "platform.version系统版本"
+      function: "platform.version("
+      description: "获取系统详细版本，可能泄露系统信息"
+      regex: true
+      pattern: "platform\\.version\\s*\\("
+      
+    - name: "platform.machine机器类型"
+      function: "platform.machine("
+      description: "获取机器类型，可能泄露系统信息"
+      regex: true
+      pattern: "platform\\.machine\\s*\\("
+      
+    - name: "platform.processor处理器信息"
+      function: "platform.processor("
+      description: "获取处理器信息，可能泄露系统信息"
+      regex: true
+      pattern: "platform\\.processor\\s*\\("
+      
+    - name: "platform.node主机名"
+      function: "platform.node("
+      description: "获取主机名，可能泄露系统信息"
+      regex: true
+      pattern: "platform\\.node\\s*\\("
+      
+    - name: "socket.gethostname主机名"
+      function: "socket.gethostname("
+      description: "获取主机名，可能泄露主机信息"
+      regex: true
+      pattern: "socket\\.gethostname\\s*\\("
+      
+    - name: "socket.gethostbyname主机解析"
+      function: "socket.gethostbyname("
+      description: "解析主机名为IP，可能存在DNS查询"
+      regex: true
+      pattern: "socket\\.gethostbyname\\s*\\("
+      
+    - name: "socket.getaddrinfo地址信息"
+      function: "socket.getaddrinfo("
+      description: "获取地址信息"
+      regex: true
+      pattern: "socket\\.getaddrinfo\\s*\\("
+      
+    - name: "getpass.getpass密码输入"
+      function: "getpass.getpass("
+      description: "获取密码输入"
+      regex: true
+      pattern: "getpass\\.getpass\\s*\\("
+      
+    - name: "getpass.getuser用户名"
+      function: "getpass.getuser("
+      description: "获取当前用户名，可能泄露用户信息"
+      regex: true
+      pattern: "getpass\\.getuser\\s*\\("
+      
+    - name: "pwd.getpwuid用户信息"
+      function: "pwd.getpwuid("
+      description: "根据UID获取用户信息"
+      regex: true
+      pattern: "pwd\\.getpwuid\\s*\\("
+      
+    - name: "pwd.getpwnam用户信息"
+      function: "pwd.getpwnam("
+      description: "根据用户名获取用户信息"
+      regex: true
+      pattern: "pwd\\.getpwnam\\s*\\("
+      
+    - name: "grp.getgrgid组信息"
+      function: "grp.getgrgid("
+      description: "根据GID获取组信息"
+      regex: true
+      pattern: "grp\\.getgrgid\\s*\\("
+      
+    - name: "grp.getgrnam组信息"
+      function: "grp.getgrnam("
+      description: "根据组名获取组信息"
+      regex: true
+      pattern: "grp\\.getgrnam\\s*\\("
+      
+    - name: "inspect.stack堆栈检查"
+      function: "inspect.stack("
+      description: "检查调用堆栈，可能泄露路径信息"
+      regex: true
+      pattern: "inspect\\.stack\\s*\\("
+      
+    - name: "inspect.trace异常追踪"
+      function: "inspect.trace("
+      description: "检查异常追踪，可能泄露路径信息"
+      regex: true
+      pattern: "inspect\\.trace\\s*\\("
+      
+    - name: "inspect.getmembers成员检查"
+      function: "inspect.getmembers("
+      description: "获取对象成员"
+      regex: true
+      pattern: "inspect\\.getmembers\\s*\\("
+      
+    - name: "dir对象属性"
+      function: "dir("
+      description: "获取对象属性列表"
+      regex: true
+      pattern: "dir\\s*\\("
+      
+    - name: "vars对象字典"
+      function: "vars("
+      description: "获取对象__dict__属性"
+      regex: true
+      pattern: "vars\\s*\\("
+      
+    - name: "globals全局变量"
+      function: "globals("
+      description: "获取全局变量字典，可能泄露敏感信息"
+      regex: true
+      pattern: "globals\\s*\\("
+      
+    - name: "locals局部变量"
+      function: "locals("
+      description: "获取局部变量字典，可能泄露敏感信息"
+      regex: true
+      pattern: "locals\\s*\\("
+      
+    - name: "getattr属性获取"
+      function: "getattr("
+      description: "获取对象属性，注意属性名来源"
+      regex: true
+      pattern: "getattr\\s*\\("
+      
+    - name: "setattr属性设置"
+      function: "setattr("
+      description: "设置对象属性，注意属性名和值来源"
+      regex: true
+      pattern: "setattr\\s*\\("
+      
+    - name: "delattr属性删除"
+      function: "delattr("
+      description: "删除对象属性"
+      regex: true
+      pattern: "delattr\\s*\\("
+      
+    - name: "hasattr属性检查"
+      function: "hasattr("
+      description: "检查对象属性"
+      regex: true
+      pattern: "hasattr\\s*\\("
+      
+    - name: "type类型获取"
+      function: "type("
+      description: "获取对象类型"
+      regex: true
+      pattern: "type\\s*\\("
+      
+    - name: "isinstance类型检查"
+      function: "isinstance("
+      description: "检查对象类型"
+      regex: true
+      pattern: "isinstance\\s*\\("
+      
+    - name: "id对象标识"
+      function: "id("
+      description: "获取对象标识"
+      regex: true
+      pattern: "id\\s*\\("
+      
+    - name: "repr对象表示"
+      function: "repr("
+      description: "获取对象表示字符串"
+      regex: true
+      pattern: "repr\\s*\\("
+

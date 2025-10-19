@@ -1,0 +1,982 @@
+language: PHP
+version: "1.0"
+description: "PHP代码审计规则集"
+
+rules:
+  critical:
+    - name: "eval函数"
+      function: "eval("
+      description: "PHP命令执行函数，可以执行任意PHP代码，存在严重的命令注入风险"
+      regex: false
+      pattern: "eval("
+      
+    - name: "system函数"
+      function: "system("
+      description: "执行外部程序并显示输出，存在命令注入风险"
+      regex: true
+      pattern: "system\\s*\\("
+      
+    - name: "exec函数"
+      function: "exec("
+      description: "执行外部程序，存在命令注入风险"
+      regex: true
+      pattern: "exec\\s*\\("
+      
+    - name: "shell_exec函数"
+      function: "shell_exec("
+      description: "通过shell执行命令并返回完整的输出字符串"
+      regex: true
+      pattern: "shell_exec\\s*\\("
+      
+    - name: "passthru函数"
+      function: "passthru("
+      description: "执行外部程序并显示原始输出"
+      regex: true
+      pattern: "passthru\\s*\\("
+      
+    - name: "popen函数"
+      function: "popen("
+      description: "打开进程文件指针，可执行命令"
+      regex: true
+      pattern: "popen\\s*\\("
+      
+    - name: "proc_open函数"
+      function: "proc_open("
+      description: "执行命令并打开文件指针进行读写"
+      regex: true
+      pattern: "proc_open\\s*\\("
+      
+    - name: "assert函数"
+      function: "assert("
+      description: "PHP 7之前版本可执行任意代码"
+      regex: true
+      pattern: "assert\\s*\\("
+      
+    - name: "create_function函数"
+      function: "create_function("
+      description: "动态创建函数，可能导致代码注入"
+      regex: true
+      pattern: "create_function\\s*\\("
+      
+    - name: "pcntl_exec函数"
+      function: "pcntl_exec("
+      description: "在当前进程空间执行指定程序，存在命令执行风险"
+      regex: true
+      pattern: "pcntl_exec\\s*\\("
+      
+    - name: "反引号命令执行"
+      function: "`"
+      description: "反引号执行系统命令，存在严重的命令注入风险"
+      regex: true
+      pattern: "`[^`]*`"
+      
+    - name: "preg_replace代码执行"
+      function: "preg_replace("
+      description: "使用/e修饰符时可执行代码，存在代码注入风险(PHP<7)"
+      regex: true
+      pattern: "preg_replace\\s*\\(\\s*['\"][^'\"]*e[^'\"]*['\"]"
+      
+
+  high:
+    - name: "unserialize函数"
+      function: "unserialize("
+      description: "反序列化函数，可能存在对象注入/反序列化漏洞"
+      regex: false
+      pattern: "unserialize("
+      
+    - name: "include文件包含"
+      function: "include("
+      description: "包含并运行指定文件，可能存在文件包含漏洞"
+      regex: true
+      pattern: "include\\s*\\("
+      
+    - name: "require文件包含"
+      function: "require("
+      description: "包含并运行指定文件，可能存在文件包含漏洞"
+      regex: true
+      pattern: "require\\s*\\("
+      
+    - name: "include_once文件包含"
+      function: "include_once("
+      description: "包含并运行指定文件（仅一次），可能存在文件包含漏洞"
+      regex: true
+      pattern: "include_once\\s*\\("
+      
+    - name: "require_once文件包含"
+      function: "require_once("
+      description: "包含并运行指定文件（仅一次），可能存在文件包含漏洞"
+      regex: true
+      pattern: "require_once\\s*\\("
+      
+    - name: "file_get_contents远程读取"
+      function: "file_get_contents("
+      description: "可读取远程文件，注意SSRF风险"
+      regex: true
+      pattern: "file_get_contents\\s*\\(\\s*\\$"
+      
+    - name: "curl_exec远程请求"
+      function: "curl_exec("
+      description: "执行cURL请求，注意SSRF风险"
+      regex: true
+      pattern: "curl_exec\\s*\\("
+      
+    - name: "mail函数"
+      function: "mail("
+      description: "发送邮件，可能存在邮件头注入"
+      regex: true
+      pattern: "mail\\s*\\("
+      
+    - name: "extract变量覆盖"
+      function: "extract("
+      description: "从数组中将变量导入当前符号表，可能导致变量覆盖"
+      regex: true
+      pattern: "extract\\s*\\("
+      
+    - name: "parse_str变量覆盖"
+      function: "parse_str("
+      description: "将字符串解析成多个变量，可能导致变量覆盖"
+      regex: true
+      pattern: "parse_str\\s*\\(.*,\\s*\\$"
+      
+    - name: "import_request_variables变量覆盖"
+      function: "import_request_variables("
+      description: "将GET/POST/Cookie变量导入全局作用域，可能导致变量覆盖(PHP<5.4已移除)"
+      regex: true
+      pattern: "import_request_variables\\s*\\("
+      
+    - name: "$$变量覆盖"
+      function: "$$"
+      description: "可变变量，可能导致变量覆盖"
+      regex: true
+      pattern: "\\$\\$"
+      
+    - name: "simplexml_load_file XXE"
+      function: "simplexml_load_file("
+      description: "加载XML文件，可能存在XXE(XML外部实体注入)漏洞"
+      regex: true
+      pattern: "simplexml_load_file\\s*\\("
+      
+    - name: "simplexml_load_string XXE"
+      function: "simplexml_load_string("
+      description: "加载XML字符串，可能存在XXE(XML外部实体注入)漏洞"
+      regex: true
+      pattern: "simplexml_load_string\\s*\\("
+      
+    - name: "SimpleXMLElement XXE"
+      function: "SimpleXMLElement("
+      description: "创建SimpleXMLElement对象，可能存在XXE漏洞"
+      regex: true
+      pattern: "new\\s+SimpleXMLElement\\s*\\("
+      
+    - name: "DOMDocument XXE"
+      function: "DOMDocument("
+      description: "创建DOMDocument对象，可能存在XXE漏洞"
+      regex: true
+      pattern: "new\\s+DOMDocument\\s*\\("
+      
+    - name: "xml_parse XXE"
+      function: "xml_parse("
+      description: "解析XML，可能存在XXE漏洞"
+      regex: true
+      pattern: "xml_parse\\s*\\("
+      
+    - name: "fsockopen SSRF"
+      function: "fsockopen("
+      description: "打开网络连接或Unix套接字，可能存在SSRF风险"
+      regex: true
+      pattern: "fsockopen\\s*\\("
+      
+    - name: "pfsockopen SSRF"
+      function: "pfsockopen("
+      description: "打开持久网络连接，可能存在SSRF风险"
+      regex: true
+      pattern: "pfsockopen\\s*\\("
+      
+    - name: "stream_socket_client SSRF"
+      function: "stream_socket_client("
+      description: "创建网络或Unix域套接字客户端连接，可能存在SSRF风险"
+      regex: true
+      pattern: "stream_socket_client\\s*\\("
+      
+    - name: "curl_setopt SSRF"
+      function: "curl_setopt("
+      description: "设置cURL传输选项，注意URL参数可能存在SSRF风险"
+      regex: true
+      pattern: "curl_setopt\\s*\\("
+      
+    - name: "serialize序列化"
+      function: "serialize("
+      description: "序列化数据，注意反序列化时的安全问题"
+      regex: true
+      pattern: "serialize\\s*\\("
+      
+    - name: "unserialize反序列化"
+      function: "unserialize("
+      description: "反序列化数据，可能存在对象注入漏洞"
+      regex: true
+      pattern: "unserialize\\s*\\("
+      
+    - name: "header Location跳转"
+      function: "header("
+      description: "HTTP头部设置，注意Location跳转可能导致开放重定向"
+      regex: true
+      pattern: "header\\s*\\(\\s*['\"]Location:"
+      
+    - name: "mb_send_mail邮件注入"
+      function: "mb_send_mail("
+      description: "发送邮件，可能存在邮件头注入"
+      regex: true
+      pattern: "mb_send_mail\\s*\\("
+
+  medium:
+    - name: "file_get_contents文件读取"
+      function: "file_get_contents("
+      description: "读取文件内容，注意路径验证防止路径遍历"
+      regex: true
+      pattern: "file_get_contents\\s*\\("
+      
+    - name: "fopen文件打开"
+      function: "fopen("
+      description: "打开文件或URL，注意路径验证"
+      regex: true
+      pattern: "fopen\\s*\\("
+      
+    - name: "fgets文件操作"
+      function: "fgets("
+      description: "从文件指针中读取一行"
+      regex: true
+      pattern: "fgets\\s*\\("
+      
+    - name: "fread文件读取"
+      function: "fread("
+      description: "读取文件（二进制安全）"
+      regex: true
+      pattern: "fread\\s*\\("
+      
+    - name: "file_put_contents文件写入"
+      function: "file_put_contents("
+      description: "将数据写入文件，注意文件名和路径验证"
+      regex: true
+      pattern: "file_put_contents\\s*\\("
+      
+    - name: "fwrite文件写入"
+      function: "fwrite("
+      description: "写入文件（二进制安全）"
+      regex: true
+      pattern: "fwrite\\s*\\("
+      
+    - name: "move_uploaded_file文件上传"
+      function: "move_uploaded_file("
+      description: "移动上传的文件，注意文件类型和路径验证"
+      regex: true
+      pattern: "move_uploaded_file\\s*\\("
+      
+    - name: "copy文件复制"
+      function: "copy("
+      description: "复制文件"
+      regex: true
+      pattern: "copy\\s*\\("
+      
+    - name: "rename文件重命名"
+      function: "rename("
+      description: "重命名或移动文件"
+      regex: true
+      pattern: "rename\\s*\\("
+      
+    - name: "unlink文件删除"
+      function: "unlink("
+      description: "删除文件"
+      regex: true
+      pattern: "unlink\\s*\\("
+      
+    - name: "readfile文件读取"
+      function: "readfile("
+      description: "读取文件并输出到输出缓冲"
+      regex: true
+      pattern: "readfile\\s*\\("
+      
+    - name: "file文件读取"
+      function: "file("
+      description: "把整个文件读入一个数组中"
+      regex: true
+      pattern: "file\\s*\\("
+      
+    - name: "$_GET用户输入"
+      function: "$_GET"
+      description: "GET参数，未过滤直接使用可能导致多种漏洞"
+      regex: true
+      pattern: "\\$_GET\\["
+      
+    - name: "$_POST用户输入"
+      function: "$_POST"
+      description: "POST参数，未过滤直接使用可能导致多种漏洞"
+      regex: true
+      pattern: "\\$_POST\\["
+      
+    - name: "$_REQUEST用户输入"
+      function: "$_REQUEST"
+      description: "REQUEST参数，未过滤直接使用可能导致多种漏洞"
+      regex: true
+      pattern: "\\$_REQUEST\\["
+      
+    - name: "$_COOKIE用户输入"
+      function: "$_COOKIE"
+      description: "COOKIE参数，未过滤直接使用可能导致多种漏洞"
+      regex: true
+      pattern: "\\$_COOKIE\\["
+      
+    - name: "$_SERVER用户输入"
+      function: "$_SERVER"
+      description: "SERVER参数，部分值来自用户可控，未过滤使用可能导致漏洞"
+      regex: true
+      pattern: "\\$_SERVER\\["
+      
+    - name: "opendir目录遍历"
+      function: "opendir("
+      description: "打开目录句柄，可能存在目录遍历风险"
+      regex: true
+      pattern: "opendir\\s*\\("
+      
+    - name: "readdir目录遍历"
+      function: "readdir("
+      description: "读取目录条目，可能存在目录遍历风险"
+      regex: true
+      pattern: "readdir\\s*\\("
+      
+    - name: "scandir目录遍历"
+      function: "scandir("
+      description: "列出目录中的文件和目录，可能存在目录遍历风险"
+      regex: true
+      pattern: "scandir\\s*\\("
+      
+    - name: "glob文件模式匹配"
+      function: "glob("
+      description: "寻找与模式匹配的文件路径，可能存在目录遍历风险"
+      regex: true
+      pattern: "glob\\s*\\("
+      
+    - name: "file_exists Phar反序列化"
+      function: "file_exists("
+      description: "检查文件是否存在，可触发phar反序列化"
+      regex: true
+      pattern: "file_exists\\s*\\("
+      
+    - name: "is_file Phar反序列化"
+      function: "is_file("
+      description: "判断是否为文件，可触发phar反序列化"
+      regex: true
+      pattern: "is_file\\s*\\("
+      
+    - name: "is_dir Phar反序列化"
+      function: "is_dir("
+      description: "判断是否为目录，可触发phar反序列化"
+      regex: true
+      pattern: "is_dir\\s*\\("
+      
+    - name: "is_link Phar反序列化"
+      function: "is_link("
+      description: "判断是否为符号链接，可触发phar反序列化"
+      regex: true
+      pattern: "is_link\\s*\\("
+      
+    - name: "is_readable Phar反序列化"
+      function: "is_readable("
+      description: "判断文件是否可读，可触发phar反序列化"
+      regex: true
+      pattern: "is_readable\\s*\\("
+      
+    - name: "is_writable Phar反序列化"
+      function: "is_writable("
+      description: "判断文件是否可写，可触发phar反序列化"
+      regex: true
+      pattern: "is_writable\\s*\\("
+      
+    - name: "is_executable Phar反序列化"
+      function: "is_executable("
+      description: "判断文件是否可执行，可触发phar反序列化"
+      regex: true
+      pattern: "is_executable\\s*\\("
+      
+    - name: "stat Phar反序列化"
+      function: "stat("
+      description: "获取文件信息，可触发phar反序列化"
+      regex: true
+      pattern: "stat\\s*\\("
+      
+    - name: "lstat Phar反序列化"
+      function: "lstat("
+      description: "获取文件或符号链接信息，可触发phar反序列化"
+      regex: true
+      pattern: "lstat\\s*\\("
+      
+    - name: "filemtime Phar反序列化"
+      function: "filemtime("
+      description: "获取文件修改时间，可触发phar反序列化"
+      regex: true
+      pattern: "filemtime\\s*\\("
+      
+    - name: "fileatime Phar反序列化"
+      function: "fileatime("
+      description: "获取文件访问时间，可触发phar反序列化"
+      regex: true
+      pattern: "fileatime\\s*\\("
+      
+    - name: "filectime Phar反序列化"
+      function: "filectime("
+      description: "获取文件inode修改时间，可触发phar反序列化"
+      regex: true
+      pattern: "filectime\\s*\\("
+      
+    - name: "filesize Phar反序列化"
+      function: "filesize("
+      description: "获取文件大小，可触发phar反序列化"
+      regex: true
+      pattern: "filesize\\s*\\("
+      
+    - name: "fileperms Phar反序列化"
+      function: "fileperms("
+      description: "获取文件权限，可触发phar反序列化"
+      regex: true
+      pattern: "fileperms\\s*\\("
+      
+    - name: "fileowner Phar反序列化"
+      function: "fileowner("
+      description: "获取文件所有者，可触发phar反序列化"
+      regex: true
+      pattern: "fileowner\\s*\\("
+      
+    - name: "filegroup Phar反序列化"
+      function: "filegroup("
+      description: "获取文件组，可触发phar反序列化"
+      regex: true
+      pattern: "filegroup\\s*\\("
+      
+    - name: "fileinode Phar反序列化"
+      function: "fileinode("
+      description: "获取文件inode，可触发phar反序列化"
+      regex: true
+      pattern: "fileinode\\s*\\("
+      
+    - name: "getimagesize Phar反序列化"
+      function: "getimagesize("
+      description: "获取图像大小，可触发phar反序列化"
+      regex: true
+      pattern: "getimagesize\\s*\\("
+      
+    - name: "exif_read_data Phar反序列化"
+      function: "exif_read_data("
+      description: "读取EXIF数据，可触发phar反序列化"
+      regex: true
+      pattern: "exif_read_data\\s*\\("
+      
+    - name: "hash_file Phar反序列化"
+      function: "hash_file("
+      description: "计算文件哈希值，可触发phar反序列化"
+      regex: true
+      pattern: "hash_file\\s*\\("
+      
+    - name: "md5_file Phar反序列化"
+      function: "md5_file("
+      description: "计算文件MD5，可触发phar反序列化"
+      regex: true
+      pattern: "md5_file\\s*\\("
+      
+    - name: "sha1_file Phar反序列化"
+      function: "sha1_file("
+      description: "计算文件SHA1，可触发phar反序列化"
+      regex: true
+      pattern: "sha1_file\\s*\\("
+      
+    - name: "parse_ini_file Phar反序列化"
+      function: "parse_ini_file("
+      description: "解析INI文件，可触发phar反序列化"
+      regex: true
+      pattern: "parse_ini_file\\s*\\("
+      
+    - name: "fgetc文件操作"
+      function: "fgetc("
+      description: "从文件指针中读取字符"
+      regex: true
+      pattern: "fgetc\\s*\\("
+      
+    - name: "fputs文件写入"
+      function: "fputs("
+      description: "写入文件（fwrite的别名）"
+      regex: true
+      pattern: "fputs\\s*\\("
+      
+    - name: "touch文件操作"
+      function: "touch("
+      description: "设置文件的访问和修改时间"
+      regex: true
+      pattern: "touch\\s*\\("
+      
+    - name: "chmod文件权限"
+      function: "chmod("
+      description: "改变文件权限"
+      regex: true
+      pattern: "chmod\\s*\\("
+      
+    - name: "chown文件所有者"
+      function: "chown("
+      description: "改变文件所有者"
+      regex: true
+      pattern: "chown\\s*\\("
+      
+    - name: "chgrp文件组"
+      function: "chgrp("
+      description: "改变文件组"
+      regex: true
+      pattern: "chgrp\\s*\\("
+      
+    - name: "rmdir目录删除"
+      function: "rmdir("
+      description: "删除目录"
+      regex: true
+      pattern: "rmdir\\s*\\("
+      
+    - name: "mkdir目录创建"
+      function: "mkdir("
+      description: "创建目录"
+      regex: true
+      pattern: "mkdir\\s*\\("
+      
+    - name: "finfo_file文件类型检测"
+      function: "finfo_file("
+      description: "返回文件信息，可触发phar反序列化"
+      regex: true
+      pattern: "finfo_file\\s*\\("
+      
+    - name: "mime_content_type文件类型"
+      function: "mime_content_type("
+      description: "检测文件MIME类型，可触发phar反序列化"
+      regex: true
+      pattern: "mime_content_type\\s*\\("
+      
+    - name: "pathinfo路径信息"
+      function: "pathinfo("
+      description: "返回文件路径信息"
+      regex: true
+      pattern: "pathinfo\\s*\\("
+      
+    - name: "basename文件名"
+      function: "basename("
+      description: "返回路径中的文件名部分"
+      regex: true
+      pattern: "basename\\s*\\("
+      
+    - name: "dirname目录名"
+      function: "dirname("
+      description: "返回路径中的目录部分"
+      regex: true
+      pattern: "dirname\\s*\\("
+      
+    - name: "disk_free_space磁盘空间"
+      function: "disk_free_space("
+      description: "返回目录中的可用空间，可触发phar反序列化"
+      regex: true
+      pattern: "disk_free_space\\s*\\("
+      
+    - name: "disk_total_space磁盘空间"
+      function: "disk_total_space("
+      description: "返回目录的磁盘总大小，可触发phar反序列化"
+      regex: true
+      pattern: "disk_total_space\\s*\\("
+      
+    - name: "tmpfile临时文件"
+      function: "tmpfile("
+      description: "创建临时文件"
+      regex: true
+      pattern: "tmpfile\\s*\\("
+      
+    - name: "tempnam临时文件"
+      function: "tempnam("
+      description: "创建具有唯一文件名的临时文件"
+      regex: true
+      pattern: "tempnam\\s*\\("
+      
+    - name: "header Content-Disposition下载"
+      function: "header("
+      description: "设置文件下载头，注意文件名注入"
+      regex: true
+      pattern: "header\\s*\\(\\s*['\"]Content-Disposition:"
+      
+    - name: "mysqli_query数据库查询"
+      function: "mysqli_query("
+      description: "执行MySQL查询，注意SQL注入"
+      regex: true
+      pattern: "mysqli_query\\s*\\("
+      
+    - name: "mysql_query数据库查询"
+      function: "mysql_query("
+      description: "执行MySQL查询(已废弃)，注意SQL注入"
+      regex: true
+      pattern: "mysql_query\\s*\\("
+      
+    - name: "pg_query PostgreSQL查询"
+      function: "pg_query("
+      description: "执行PostgreSQL查询，注意SQL注入"
+      regex: true
+      pattern: "pg_query\\s*\\("
+      
+    - name: "sqlite_query SQLite查询"
+      function: "sqlite_query("
+      description: "执行SQLite查询，注意SQL注入"
+      regex: true
+      pattern: "sqlite_query\\s*\\("
+      
+    - name: "PDO::query数据库查询"
+      function: "->query("
+      description: "PDO执行SQL查询，注意SQL注入"
+      regex: true
+      pattern: "->query\\s*\\("
+      
+    - name: "PDO::exec数据库执行"
+      function: "->exec("
+      description: "PDO执行SQL语句，注意SQL注入"
+      regex: true
+      pattern: "->exec\\s*\\("
+      
+    - name: "session_start会话操作"
+      function: "session_start("
+      description: "启动会话，注意会话固定和会话劫持"
+      regex: true
+      pattern: "session_start\\s*\\("
+      
+    - name: "setcookie Cookie设置"
+      function: "setcookie("
+      description: "设置Cookie，注意HttpOnly和Secure标志"
+      regex: true
+      pattern: "setcookie\\s*\\("
+      
+    - name: "setrawcookie Cookie设置"
+      function: "setrawcookie("
+      description: "设置原始Cookie值，注意HttpOnly和Secure标志"
+      regex: true
+      pattern: "setrawcookie\\s*\\("
+      
+    - name: "stream_context_create流上下文"
+      function: "stream_context_create("
+      description: "创建流上下文，注意SSRF风险"
+      regex: true
+      pattern: "stream_context_create\\s*\\("
+      
+    - name: "socket_create套接字创建"
+      function: "socket_create("
+      description: "创建套接字，注意网络安全"
+      regex: true
+      pattern: "socket_create\\s*\\("
+      
+    - name: "socket_connect套接字连接"
+      function: "socket_connect("
+      description: "连接套接字，可能存在SSRF风险"
+      regex: true
+      pattern: "socket_connect\\s*\\("
+      
+    - name: "proc_get_status进程信息"
+      function: "proc_get_status("
+      description: "获取进程信息"
+      regex: true
+      pattern: "proc_get_status\\s*\\("
+      
+    - name: "proc_close进程关闭"
+      function: "proc_close("
+      description: "关闭进程"
+      regex: true
+      pattern: "proc_close\\s*\\("
+      
+    - name: "proc_terminate进程终止"
+      function: "proc_terminate("
+      description: "终止进程"
+      regex: true
+      pattern: "proc_terminate\\s*\\("
+      
+    - name: "escapeshellarg参数转义"
+      function: "escapeshellarg("
+      description: "转义shell参数，注意命令注入"
+      regex: true
+      pattern: "escapeshellarg\\s*\\("
+      
+    - name: "escapeshellcmd命令转义"
+      function: "escapeshellcmd("
+      description: "转义shell命令，注意命令注入"
+      regex: true
+      pattern: "escapeshellcmd\\s*\\("
+      
+    - name: "array_map数组映射"
+      function: "array_map("
+      description: "为数组的每个元素应用回调函数，注意回调函数注入"
+      regex: true
+      pattern: "array_map\\s*\\("
+      
+    - name: "array_filter数组过滤"
+      function: "array_filter("
+      description: "用回调函数过滤数组，注意回调函数注入"
+      regex: true
+      pattern: "array_filter\\s*\\("
+      
+    - name: "array_reduce数组归约"
+      function: "array_reduce("
+      description: "用回调函数迭代地将数组简化为单一值，注意回调函数注入"
+      regex: true
+      pattern: "array_reduce\\s*\\("
+      
+    - name: "array_walk数组遍历"
+      function: "array_walk("
+      description: "使用用户自定义函数对数组中的每个元素做回调处理"
+      regex: true
+      pattern: "array_walk\\s*\\("
+      
+    - name: "array_walk_recursive递归遍历"
+      function: "array_walk_recursive("
+      description: "递归地对数组中的每个元素应用用户函数"
+      regex: true
+      pattern: "array_walk_recursive\\s*\\("
+      
+    - name: "uasort数组排序"
+      function: "uasort("
+      description: "使用用户自定义比较函数对数组排序"
+      regex: true
+      pattern: "uasort\\s*\\("
+      
+    - name: "uksort数组排序"
+      function: "uksort("
+      description: "使用用户自定义比较函数对数组键名排序"
+      regex: true
+      pattern: "uksort\\s*\\("
+      
+    - name: "usort数组排序"
+      function: "usort("
+      description: "使用用户自定义比较函数对数组排序"
+      regex: true
+      pattern: "usort\\s*\\("
+      
+    - name: "preg_replace_callback正则替换"
+      function: "preg_replace_callback("
+      description: "执行正则表达式搜索和替换（使用回调）"
+      regex: true
+      pattern: "preg_replace_callback\\s*\\("
+      
+    - name: "register_shutdown_function关闭函数"
+      function: "register_shutdown_function("
+      description: "注册脚本结束时执行的函数"
+      regex: true
+      pattern: "register_shutdown_function\\s*\\("
+      
+    - name: "register_tick_function Tick函数"
+      function: "register_tick_function("
+      description: "注册tick时调用的函数"
+      regex: true
+      pattern: "register_tick_function\\s*\\("
+      
+    - name: "filter_var过滤器"
+      function: "filter_var("
+      description: "使用特定的过滤器过滤一个变量"
+      regex: true
+      pattern: "filter_var\\s*\\("
+      
+    - name: "filter_input过滤输入"
+      function: "filter_input("
+      description: "通过名称获取特定的外部变量，并可选地过滤它"
+      regex: true
+      pattern: "filter_input\\s*\\("
+      
+    - name: "ldap_search LDAP查询"
+      function: "ldap_search("
+      description: "LDAP搜索，注意LDAP注入"
+      regex: true
+      pattern: "ldap_search\\s*\\("
+      
+    - name: "yaml_parse YAML解析"
+      function: "yaml_parse("
+      description: "解析YAML字符串，可能存在反序列化风险"
+      regex: true
+      pattern: "yaml_parse\\s*\\("
+      
+    - name: "yaml_parse_file YAML解析"
+      function: "yaml_parse_file("
+      description: "解析YAML文件，可能存在反序列化风险"
+      regex: true
+      pattern: "yaml_parse_file\\s*\\("
+
+  low:
+    - name: "phpinfo信息泄露"
+      function: "phpinfo("
+      description: "输出PHP配置信息，可能导致信息泄露，生产环境应移除"
+      regex: true
+      pattern: "phpinfo\\s*\\("
+      
+    - name: "print_r调试输出"
+      function: "print_r("
+      description: "打印变量信息，生产环境应移除"
+      regex: true
+      pattern: "print_r\\s*\\("
+      
+    - name: "var_dump调试输出"
+      function: "var_dump("
+      description: "打印变量详细信息，生产环境应移除"
+      regex: true
+      pattern: "var_dump\\s*\\("
+      
+    - name: "var_export调试输出"
+      function: "var_export("
+      description: "输出或返回变量的字符串表示，生产环境应移除"
+      regex: true
+      pattern: "var_export\\s*\\("
+      
+    - name: "error_reporting错误报告"
+      function: "error_reporting("
+      description: "设置错误报告级别，生产环境应关闭详细错误"
+      regex: true
+      pattern: "error_reporting\\s*\\("
+      
+    - name: "ini_set配置修改"
+      function: "ini_set("
+      description: "运行时修改配置，注意安全配置"
+      regex: true
+      pattern: "ini_set\\s*\\("
+      
+    - name: "debug_backtrace调试信息"
+      function: "debug_backtrace("
+      description: "生成回溯跟踪，可能泄露敏感信息"
+      regex: true
+      pattern: "debug_backtrace\\s*\\("
+      
+    - name: "debug_print_backtrace调试信息"
+      function: "debug_print_backtrace("
+      description: "打印回溯跟踪，可能泄露敏感信息"
+      regex: true
+      pattern: "debug_print_backtrace\\s*\\("
+      
+    - name: "get_defined_vars变量信息"
+      function: "get_defined_vars("
+      description: "获取所有已定义变量，可能泄露敏感信息"
+      regex: true
+      pattern: "get_defined_vars\\s*\\("
+      
+    - name: "get_defined_functions函数信息"
+      function: "get_defined_functions("
+      description: "获取所有已定义函数，可能泄露系统信息"
+      regex: true
+      pattern: "get_defined_functions\\s*\\("
+      
+    - name: "get_loaded_extensions扩展信息"
+      function: "get_loaded_extensions("
+      description: "获取所有已加载扩展，可能泄露系统信息"
+      regex: true
+      pattern: "get_loaded_extensions\\s*\\("
+      
+    - name: "get_defined_constants常量信息"
+      function: "get_defined_constants("
+      description: "获取所有已定义常量，可能泄露敏感信息"
+      regex: true
+      pattern: "get_defined_constants\\s*\\("
+      
+    - name: "get_included_files文件信息"
+      function: "get_included_files("
+      description: "获取所有被包含文件列表，可能泄露路径信息"
+      regex: true
+      pattern: "get_included_files\\s*\\("
+      
+    - name: "getenv环境变量"
+      function: "getenv("
+      description: "获取环境变量值，可能泄露敏感信息"
+      regex: true
+      pattern: "getenv\\s*\\("
+      
+    - name: "putenv环境变量"
+      function: "putenv("
+      description: "设置环境变量值"
+      regex: true
+      pattern: "putenv\\s*\\("
+      
+    - name: "dl动态加载"
+      function: "dl("
+      description: "运行时加载PHP扩展，可能存在安全风险"
+      regex: true
+      pattern: "dl\\s*\\("
+      
+    - name: "highlight_file源码泄露"
+      function: "highlight_file("
+      description: "高亮显示文件内容，可能导致源码泄露"
+      regex: true
+      pattern: "highlight_file\\s*\\("
+      
+    - name: "show_source源码泄露"
+      function: "show_source("
+      description: "显示文件源码（highlight_file别名），可能导致源码泄露"
+      regex: true
+      pattern: "show_source\\s*\\("
+      
+    - name: "php_uname系统信息"
+      function: "php_uname("
+      description: "获取系统信息，可能泄露服务器信息"
+      regex: true
+      pattern: "php_uname\\s*\\("
+      
+    - name: "getmypid进程信息"
+      function: "getmypid("
+      description: "获取PHP进程ID"
+      regex: true
+      pattern: "getmypid\\s*\\("
+      
+    - name: "getmyuid用户信息"
+      function: "getmyuid("
+      description: "获取PHP脚本所有者的用户ID"
+      regex: true
+      pattern: "getmyuid\\s*\\("
+      
+    - name: "getmygid组信息"
+      function: "getmygid("
+      description: "获取PHP脚本所有者的组ID"
+      regex: true
+      pattern: "getmygid\\s*\\("
+      
+    - name: "get_current_user当前用户"
+      function: "get_current_user("
+      description: "获取当前PHP脚本所有者的名称"
+      regex: true
+      pattern: "get_current_user\\s*\\("
+      
+    - name: "getcwd当前目录"
+      function: "getcwd("
+      description: "获取当前工作目录"
+      regex: true
+      pattern: "getcwd\\s*\\("
+      
+    - name: "ini_get配置读取"
+      function: "ini_get("
+      description: "获取配置选项的值"
+      regex: true
+      pattern: "ini_get\\s*\\("
+      
+    - name: "ini_get_all配置读取"
+      function: "ini_get_all("
+      description: "获取所有配置选项"
+      regex: true
+      pattern: "ini_get_all\\s*\\("
+      
+    - name: "get_cfg_var配置读取"
+      function: "get_cfg_var("
+      description: "获取PHP配置选项的值"
+      regex: true
+      pattern: "get_cfg_var\\s*\\("
+      
+    - name: "error_log错误日志"
+      function: "error_log("
+      description: "发送错误信息到日志"
+      regex: true
+      pattern: "error_log\\s*\\("
+      
+    - name: "syslog系统日志"
+      function: "syslog("
+      description: "生成系统日志消息"
+      regex: true
+      pattern: "syslog\\s*\\("
+      
+    - name: "closelog日志操作"
+      function: "closelog("
+      description: "关闭系统日志连接"
+      regex: true
+      pattern: "closelog\\s*\\("
+

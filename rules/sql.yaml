@@ -1,0 +1,400 @@
+language: SQL
+version: "1.0"
+description: "SQL语句安全审计规则（仅匹配SQL语句本身）"
+
+rules:
+  critical:
+    # 危险的数据库操作
+    - name: "危险操作 - DROP DATABASE"
+      function: "DROP DATABASE"
+      description: "DROP DATABASE会删除整个数据库，极其危险"
+      regex: false
+      pattern: "DROP DATABASE"
+      caseSensitive: false
+
+    - name: "危险操作 - DROP SCHEMA"
+      function: "DROP SCHEMA"
+      description: "DROP SCHEMA会删除整个模式，极其危险"
+      regex: false
+      pattern: "DROP SCHEMA"
+      caseSensitive: false
+
+    - name: "危险操作 - DROP TABLE"
+      function: "DROP TABLE"
+      description: "DROP TABLE会永久删除表结构和数据"
+      regex: false
+      pattern: "DROP TABLE"
+      caseSensitive: false
+
+    - name: "危险操作 - TRUNCATE TABLE"
+      function: "TRUNCATE TABLE"
+      description: "TRUNCATE TABLE会清空表数据且无法回滚"
+      regex: false
+      pattern: "TRUNCATE TABLE"
+      caseSensitive: false
+
+    - name: "危险操作 - TRUNCATE"
+      function: "TRUNCATE"
+      description: "TRUNCATE会清空数据且无法回滚"
+      regex: true
+      pattern: "TRUNCATE\\s+\\w+"
+      caseSensitive: false
+
+    - name: "危险操作 - DELETE无WHERE"
+      function: "DELETE FROM"
+      description: "DELETE语句缺少WHERE条件，会删除表中所有数据"
+      regex: true
+      pattern: "DELETE\\s+FROM\\s+[\\w`]+\\s*(?:;|$)"
+      caseSensitive: false
+
+    - name: "危险操作 - UPDATE无WHERE"
+      function: "UPDATE"
+      description: "UPDATE语句缺少WHERE条件，会更新表中所有数据"
+      regex: true
+      pattern: "UPDATE\\s+[\\w`]+\\s+SET\\s+[^;]*?(?:;|$)"
+      caseSensitive: false
+
+  high:
+    # 表结构修改
+    - name: "表结构 - DROP COLUMN"
+      function: "DROP COLUMN"
+      description: "DROP COLUMN会删除列及其所有数据，无法恢复"
+      regex: false
+      pattern: "DROP COLUMN"
+      caseSensitive: false
+
+    - name: "表结构 - ALTER TABLE DROP"
+      function: "ALTER TABLE"
+      description: "ALTER TABLE DROP会删除表结构或约束"
+      regex: true
+      pattern: "ALTER\\s+TABLE.*DROP"
+      caseSensitive: false
+
+    - name: "表结构 - ALTER COLUMN"
+      function: "ALTER COLUMN"
+      description: "ALTER COLUMN修改列定义可能导致数据丢失"
+      regex: false
+      pattern: "ALTER COLUMN"
+      caseSensitive: false
+
+    # 权限管理
+    - name: "权限管理 - GRANT ALL"
+      function: "GRANT ALL"
+      description: "授予所有权限过于宽松，违反最小权限原则"
+      regex: false
+      pattern: "GRANT ALL"
+      caseSensitive: false
+
+    - name: "权限管理 - GRANT SUPER"
+      function: "GRANT SUPER"
+      description: "授予超级用户权限，存在安全风险"
+      regex: true
+      pattern: "GRANT.*SUPER"
+      caseSensitive: false
+
+    # 危险的存储过程和函数
+    - name: "动态SQL - EXEC"
+      function: "EXEC"
+      description: "使用EXEC执行动态SQL，需确保安全"
+      regex: true
+      pattern: "EXEC\\s*\\("
+      caseSensitive: false
+
+    - name: "动态SQL - EXECUTE"
+      function: "EXECUTE"
+      description: "使用EXECUTE执行动态SQL，需确保安全"
+      regex: true
+      pattern: "EXECUTE\\s+(?:IMMEDIATE|@)"
+      caseSensitive: false
+
+    - name: "系统函数 - xp_cmdshell"
+      function: "xp_cmdshell"
+      description: "xp_cmdshell可执行系统命令，极其危险"
+      regex: false
+      pattern: "xp_cmdshell"
+      caseSensitive: false
+
+    # 锁操作
+    - name: "并发控制 - LOCK TABLES"
+      function: "LOCK TABLES"
+      description: "LOCK TABLES锁表操作影响并发性能"
+      regex: false
+      pattern: "LOCK TABLES"
+      caseSensitive: false
+
+  medium:
+    # 性能问题 - SELECT
+    - name: "性能问题 - SELECT *"
+      function: "SELECT *"
+      description: "SELECT * 查询所有字段，影响性能且可能暴露敏感数据"
+      regex: true
+      pattern: "SELECT\\s+\\*"
+      caseSensitive: false
+
+    - name: "性能问题 - 嵌套子查询"
+      function: "SELECT"
+      description: "嵌套子查询可能影响性能，建议使用JOIN优化"
+      regex: true
+      pattern: "SELECT[^;]*\\(\\s*SELECT"
+      caseSensitive: false
+
+    - name: "性能问题 - NOT IN子查询"
+      function: "NOT IN"
+      description: "NOT IN配合子查询性能差，建议使用NOT EXISTS"
+      regex: true
+      pattern: "NOT\\s+IN\\s*\\(\\s*SELECT"
+      caseSensitive: false
+
+    - name: "性能问题 - IN大量值"
+      function: "IN ("
+      description: "IN包含大量值会影响性能，建议使用临时表"
+      regex: true
+      pattern: "IN\\s*\\([^)]{200,}\\)"
+      caseSensitive: false
+
+    # LIKE查询
+    - name: "性能问题 - LIKE前置通配符"
+      function: "LIKE"
+      description: "LIKE使用前置通配符无法使用索引，性能差"
+      regex: true
+      pattern: "LIKE\\s+['\"]%"
+      caseSensitive: false
+
+    # 索引失效
+    - name: "性能问题 - WHERE中使用函数"
+      function: "WHERE"
+      description: "WHERE条件对字段使用函数会导致索引失效"
+      regex: true
+      pattern: "WHERE\\s+\\w+\\s*\\([^)]*\\w+\\.[^)]*\\)"
+      caseSensitive: false
+
+    - name: "性能问题 - OR条件过多"
+      function: "OR"
+      description: "过多OR条件影响索引使用，可考虑使用IN或UNION"
+      regex: true
+      pattern: "WHERE.*\\sOR\\s.*\\sOR\\s.*\\sOR"
+      caseSensitive: false
+
+    - name: "性能问题 - 不等于操作符"
+      function: "!="
+      description: "不等于操作符可能导致索引失效"
+      regex: true
+      pattern: "WHERE.*(?:!=|<>)"
+      caseSensitive: false
+
+    # 笛卡尔积
+    - name: "性能问题 - 笛卡尔积"
+      function: "FROM"
+      description: "多表查询缺少JOIN条件，可能产生笛卡尔积"
+      regex: true
+      pattern: "FROM\\s+\\w+\\s*,\\s*\\w+(?:\\s*,\\s*\\w+)*\\s+WHERE(?!.*(?:=|JOIN))"
+      caseSensitive: false
+
+    # 事务
+    - name: "事务安全 - BEGIN TRANSACTION"
+      function: "BEGIN"
+      description: "开启事务后需确保COMMIT或ROLLBACK"
+      regex: true
+      pattern: "BEGIN\\s+(?:TRAN|TRANSACTION)"
+      caseSensitive: false
+
+    # 权限操作
+    - name: "权限管理 - REVOKE"
+      function: "REVOKE"
+      description: "撤销权限操作，需确认影响范围"
+      regex: false
+      pattern: "REVOKE"
+      caseSensitive: false
+
+    - name: "用户管理 - CREATE USER"
+      function: "CREATE USER"
+      description: "创建用户操作，需确认权限配置"
+      regex: false
+      pattern: "CREATE USER"
+      caseSensitive: false
+
+    - name: "用户管理 - DROP USER"
+      function: "DROP USER"
+      description: "删除用户操作，需谨慎处理"
+      regex: false
+      pattern: "DROP USER"
+      caseSensitive: false
+
+  low:
+    # 聚合和统计
+    - name: "性能建议 - COUNT(*)"
+      function: "COUNT(*)"
+      description: "COUNT(*)在大表上性能较差，考虑使用近似值"
+      regex: false
+      pattern: "COUNT(*)"
+      caseSensitive: false
+
+    - name: "性能建议 - COUNT(DISTINCT)"
+      function: "COUNT(DISTINCT"
+      description: "COUNT(DISTINCT)需要去重，大数据集上性能差"
+      regex: true
+      pattern: "COUNT\\s*\\(\\s*DISTINCT"
+      caseSensitive: false
+
+    - name: "性能建议 - DISTINCT"
+      function: "DISTINCT"
+      description: "DISTINCT操作需要排序和去重，影响性能"
+      regex: false
+      pattern: "DISTINCT"
+      caseSensitive: false
+
+    - name: "性能建议 - GROUP BY"
+      function: "GROUP BY"
+      description: "GROUP BY需要分组聚合，大数据集上注意性能"
+      regex: false
+      pattern: "GROUP BY"
+      caseSensitive: false
+
+    # 排序
+    - name: "性能建议 - ORDER BY"
+      function: "ORDER BY"
+      description: "ORDER BY在大数据集上需要排序，注意性能和索引"
+      regex: false
+      pattern: "ORDER BY"
+      caseSensitive: false
+
+    - name: "性能建议 - ORDER BY函数"
+      function: "ORDER BY"
+      description: "ORDER BY使用函数无法使用索引"
+      regex: true
+      pattern: "ORDER\\s+BY\\s+\\w+\\s*\\("
+      caseSensitive: false
+
+    # JOIN操作
+    - name: "性能建议 - CROSS JOIN"
+      function: "CROSS JOIN"
+      description: "CROSS JOIN产生笛卡尔积，数据量会爆炸性增长"
+      regex: false
+      pattern: "CROSS JOIN"
+      caseSensitive: false
+
+    - name: "性能建议 - 多表JOIN"
+      function: "JOIN"
+      description: "3个以上表JOIN需要注意关联条件和索引优化"
+      regex: true
+      pattern: "JOIN.*JOIN.*JOIN"
+      caseSensitive: false
+
+    - name: "性能建议 - RIGHT JOIN"
+      function: "RIGHT JOIN"
+      description: "RIGHT JOIN可读性差，建议改为LEFT JOIN"
+      regex: false
+      pattern: "RIGHT JOIN"
+      caseSensitive: false
+
+    - name: "性能建议 - FULL OUTER JOIN"
+      function: "FULL OUTER JOIN"
+      description: "FULL OUTER JOIN性能较差，确认是否真的需要"
+      regex: true
+      pattern: "FULL\\s+(?:OUTER\\s+)?JOIN"
+      caseSensitive: false
+
+    # 分页
+    - name: "性能建议 - LIMIT深分页"
+      function: "LIMIT"
+      description: "LIMIT大偏移量时性能差，建议使用游标或记录上次位置"
+      regex: true
+      pattern: "LIMIT\\s+\\d{4,}\\s*,|LIMIT\\s+[^,]+,\\s*\\d{4,}"
+      caseSensitive: false
+
+    - name: "性能建议 - OFFSET"
+      function: "OFFSET"
+      description: "OFFSET在大偏移量时性能差，建议优化分页方式"
+      regex: true
+      pattern: "OFFSET\\s+\\d{4,}"
+      caseSensitive: false
+
+    # 并发控制
+    - name: "并发控制 - FOR UPDATE"
+      function: "FOR UPDATE"
+      description: "FOR UPDATE会加行锁，注意死锁风险"
+      regex: false
+      pattern: "FOR UPDATE"
+      caseSensitive: false
+
+    - name: "并发控制 - LOCK IN SHARE MODE"
+      function: "LOCK IN SHARE MODE"
+      description: "LOCK IN SHARE MODE加共享锁，注意锁等待"
+      regex: false
+      pattern: "LOCK IN SHARE MODE"
+      caseSensitive: false
+
+    # UNION
+    - name: "性能建议 - UNION"
+      function: "UNION"
+      description: "UNION会自动去重，如不需要去重建议使用UNION ALL"
+      regex: true
+      pattern: "UNION(?!\\s+ALL)"
+      caseSensitive: false
+
+    # 临时表
+    - name: "资源管理 - CREATE TEMPORARY TABLE"
+      function: "CREATE TEMPORARY TABLE"
+      description: "创建临时表，注意及时清理"
+      regex: true
+      pattern: "CREATE\\s+TEMPORARY\\s+TABLE"
+      caseSensitive: false
+
+    - name: "资源管理 - CREATE TEMP TABLE"
+      function: "CREATE TEMP TABLE"
+      description: "创建临时表，注意及时清理"
+      regex: true
+      pattern: "CREATE\\s+TEMP\\s+TABLE"
+      caseSensitive: false
+
+    # 视图
+    - name: "表结构 - CREATE VIEW"
+      function: "CREATE VIEW"
+      description: "创建视图，注意性能影响"
+      regex: true
+      pattern: "CREATE\\s+(?:OR\\s+REPLACE\\s+)?VIEW"
+      caseSensitive: false
+
+    - name: "表结构 - DROP VIEW"
+      function: "DROP VIEW"
+      description: "删除视图操作"
+      regex: false
+      pattern: "DROP VIEW"
+      caseSensitive: false
+
+    # 索引
+    - name: "表结构 - DROP INDEX"
+      function: "DROP INDEX"
+      description: "删除索引会影响查询性能"
+      regex: false
+      pattern: "DROP INDEX"
+      caseSensitive: false
+
+    - name: "表结构 - CREATE INDEX"
+      function: "CREATE INDEX"
+      description: "创建索引操作，大表上耗时较长"
+      regex: true
+      pattern: "CREATE\\s+(?:UNIQUE\\s+)?INDEX"
+      caseSensitive: false
+
+    # 其他
+    - name: "数据修改 - REPLACE INTO"
+      function: "REPLACE INTO"
+      description: "REPLACE INTO会先删除后插入，注意触发器和性能"
+      regex: false
+      pattern: "REPLACE INTO"
+      caseSensitive: false
+
+    - name: "数据修改 - INSERT IGNORE"
+      function: "INSERT IGNORE"
+      description: "INSERT IGNORE会忽略错误，可能掩盖数据问题"
+      regex: false
+      pattern: "INSERT IGNORE"
+      caseSensitive: false
+
+    - name: "查询优化 - HAVING"
+      function: "HAVING"
+      description: "HAVING在聚合后过滤，能在WHERE中过滤的应在WHERE中处理"
+      regex: false
+      pattern: "HAVING"
+      caseSensitive: false

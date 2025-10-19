@@ -169,27 +169,6 @@ rules:
       pattern: "ALTER USER"
       caseSensitive: false
 
-    # 事务控制
-    - name: "BEGIN TRANSACTION"
-      function: "BEGIN"
-      description: "BEGIN 开始事务"
-      regex: true
-      pattern: "BEGIN\\s+(?:TRAN|TRANSACTION)"
-      caseSensitive: false
-
-    - name: "COMMIT"
-      function: "COMMIT"
-      description: "COMMIT 提交事务"
-      regex: false
-      pattern: "COMMIT"
-      caseSensitive: false
-
-    - name: "ROLLBACK"
-      function: "ROLLBACK"
-      description: "ROLLBACK 回滚事务"
-      regex: false
-      pattern: "ROLLBACK"
-      caseSensitive: false
 
     # 锁操作
     - name: "LOCK TABLES"

@@ -82,8 +82,8 @@ rules:
     - name: "SELECT"
       function: "SELECT"
       description: "SELECT 查询数据"
-      regex: false
-      pattern: "SELECT"
+      regex: true
+      pattern: "\\bSELECT\\s+"
       caseSensitive: false
 
     # 数据修改

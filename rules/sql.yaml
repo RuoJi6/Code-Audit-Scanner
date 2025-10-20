@@ -69,37 +69,6 @@ rules:
       regex: false
       pattern: "ALTER COLUMN"
       caseSensitive: false
-
-    # 权限管理
-    - name: "GRANT"
-      function: "GRANT"
-      description: "GRANT 授予权限"
-      regex: false
-      pattern: "GRANT"
-      caseSensitive: false
-
-    - name: "REVOKE"
-      function: "REVOKE"
-      description: "REVOKE 撤销权限"
-      regex: false
-      pattern: "REVOKE"
-      caseSensitive: false
-
-    # 动态SQL
-    - name: "EXEC"
-      function: "EXEC"
-      description: "EXEC 执行动态SQL"
-      regex: true
-      pattern: "EXEC\\s*\\("
-      caseSensitive: false
-
-    - name: "EXECUTE"
-      function: "EXECUTE"
-      description: "EXECUTE 执行动态SQL"
-      regex: false
-      pattern: "EXECUTE"
-      caseSensitive: false
-
     # 系统命令
     - name: "xp_cmdshell"
       function: "xp_cmdshell"

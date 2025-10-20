@@ -15,6 +15,7 @@
 # Code-Audit-Scanner
 jetbrains 编辑器代码审计插件，是一款结合多种正则表达式的插件，其中用户可以通过定多种不同的规则，以及条件，来挖掘漏洞。
 
+jetbrains 编辑器版本【2022.3.3-最新】
 
 
 <img width="1764" height="1032" alt="image" src="https://github.com/user-attachments/assets/b05cf504-7748-4fea-aa54-c166e5e2dc65" />

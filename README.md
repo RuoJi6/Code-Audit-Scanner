@@ -20,6 +20,13 @@ jetbrains 编辑器版本【2022.3.3-最新】
 
 <img width="1764" height="1032" alt="image" src="https://github.com/user-attachments/assets/b05cf504-7748-4fea-aa54-c166e5e2dc65" />
 
+<img width="515" height="643" alt="image" src="https://github.com/user-attachments/assets/f1cc5857-7495-4865-8ea7-e5b82243e008" />
+
+<img width="1002" height="371" alt="image" src="https://github.com/user-attachments/assets/cab58fe5-bfb2-41ab-a4a5-a6d0795f4b04" />
+
+<img width="1442" height="1015" alt="image" src="https://github.com/user-attachments/assets/0dfc87f5-48ca-4c20-95dd-baf006c29884" />
+
+
 
 # 🙏 感谢名单
 <ul>

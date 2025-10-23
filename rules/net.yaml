@@ -1167,4 +1167,3 @@ rules:
       description: "获取应用启动路径，可能泄露路径信息"
       regex: true
       pattern: "Application\\.StartupPath"
-

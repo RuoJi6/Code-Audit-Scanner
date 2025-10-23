@@ -2,8 +2,167 @@ language: .NET
 version: "1.0"
 description: ".NET/C#代码审计规则集"
 
+# 规则说明：
+# 1. 单模式匹配：使用 pattern 字段（向后兼容）
+# 2. 多模式匹配：使用 patterns 字段（数组），并可选指定 matchLogic
+#    - matchLogic: "AND"  所有模式都必须匹配
+#    - matchLogic: "OR"   任意一个模式匹配即可（默认）
+
 rules:
   critical:
+    # Ajax反序列化漏洞：检测AjaxMethod中使用object类型参数
+    # - name: "AjaxMethod反序列化漏洞"
+    #   function: "[AjaxMethod]"
+    #   description: "检测使用AjaxMethod特性且包含object类型参数的方法，可能存在反序列化漏洞"
+    #   regex: true
+    #   pattern: "\\[AjaxMethod\\]"  # 主模式（向后兼容）
+    #   patterns:
+    #     - "\\[AjaxMethod\\]"  # AjaxMethod特性
+    #     - "\\bobject\\b"  # object类型关键字（简化匹配）
+    #   matchLogic: "AND"  # 必须同时包含AjaxMethod特性和object参数（支持跨行3行范围）
+    
+    # Ajax反序列化增强检测：包含类型转换的情况
+    - name: "AjaxMethod中的危险类型转换"
+      function: "AjaxMethod + Convert"
+      description: "检测AjaxMethod中对object参数进行类型转换，典型的反序列化漏洞模式"
+      regex: true
+      pattern: "Convert\\.ToString"  # 主模式
+      patterns:
+        - "\\[AjaxMethod\\]"  # AjaxMethod特性
+        - "\\bobject\\b"  # object类型参数
+        - "Convert\\."  # 类型转换操作
+      matchLogic: "AND"  # 三者必须同时出现（支持跨行3行范围）
+    
+    # WCF Service 反序列化漏洞
+    - name: "WCF ServiceContract反序列化漏洞"
+      function: "[ServiceContract]"
+      description: "检测WCF服务中使用object类型参数，可能存在反序列化漏洞"
+      regex: true
+      pattern: "\\[ServiceContract\\]|\\[OperationContract\\]"  # 主模式
+      patterns:
+        - "\\[ServiceContract\\]|\\[OperationContract\\]"  # WCF特性
+        - "\\bobject\\b"  # object类型关键字
+      matchLogic: "AND"
+    
+    # Web Service (ASMX) 反序列化漏洞
+    - name: "WebService反序列化漏洞"
+      function: "[WebMethod]"
+      description: "检测WebService中使用object类型参数，可能存在反序列化漏洞"
+      regex: true
+      pattern: "\\[WebMethod\\]"  # 主模式
+      patterns:
+        - "\\[WebMethod\\]"  # WebMethod特性
+        - "\\bobject\\b"  # object类型关键字
+      matchLogic: "AND"
+    
+    # ASP.NET MVC ModelBinder 反序列化漏洞
+    - name: "MVC自定义ModelBinder反序列化"
+      function: "IModelBinder"
+      description: "检测自定义ModelBinder实现，可能存在不安全的反序列化"
+      regex: true
+      pattern: "IModelBinder"  # 主模式
+      patterns:
+        - "IModelBinder|ModelBinder"
+        - "BinaryFormatter|ObjectStateFormatter|LosFormatter|SoapFormatter"  # 不安全的序列化器
+      matchLogic: "AND"
+    
+    # BinaryFormatter 不安全反序列化
+    - name: "BinaryFormatter不安全反序列化"
+      function: "BinaryFormatter.Deserialize"
+      description: "BinaryFormatter是已知的不安全反序列化器，可导致远程代码执行"
+      regex: true
+      pattern: "BinaryFormatter"
+      patterns:
+        - "BinaryFormatter"
+        - "\\.Deserialize\\s*\\("
+      matchLogic: "AND"
+    
+    # NetDataContractSerializer 不安全反序列化
+    - name: "NetDataContractSerializer反序列化"
+      function: "NetDataContractSerializer"
+      description: "NetDataContractSerializer可能导致反序列化漏洞，不应处理不可信数据"
+      regex: true
+      pattern: "NetDataContractSerializer"
+      patterns:
+        - "NetDataContractSerializer"
+        - "\\.Deserialize\\s*\\(|\\.ReadObject\\s*\\("
+      matchLogic: "AND"
+    
+    # ObjectStateFormatter 反序列化
+    - name: "ObjectStateFormatter反序列化"
+      function: "ObjectStateFormatter.Deserialize"
+      description: "ObjectStateFormatter用于ViewState，可能导致反序列化攻击"
+      regex: true
+      pattern: "ObjectStateFormatter"
+      patterns:
+        - "ObjectStateFormatter"
+        - "\\.Deserialize\\s*\\("
+      matchLogic: "AND"
+    
+    # LosFormatter 反序列化
+    - name: "LosFormatter反序列化"
+      function: "LosFormatter.Deserialize"
+      description: "LosFormatter是旧版ViewState序列化器，存在已知的反序列化漏洞"
+      regex: true
+      pattern: "LosFormatter"
+      patterns:
+        - "LosFormatter"
+        - "\\.Deserialize\\s*\\("
+      matchLogic: "AND"
+    
+    # SoapFormatter 反序列化
+    - name: "SoapFormatter不安全反序列化"
+      function: "SoapFormatter.Deserialize"
+      description: "SoapFormatter是不安全的反序列化器，可导致远程代码执行"
+      regex: true
+      pattern: "SoapFormatter"
+      patterns:
+        - "SoapFormatter"
+        - "\\.Deserialize\\s*\\("
+      matchLogic: "AND"
+    
+    # JavaScriptSerializer TypeResolver
+    - name: "JavaScriptSerializer TypeResolver漏洞"
+      function: "JavaScriptSerializer"
+      description: "JavaScriptSerializer配置TypeResolver时存在反序列化漏洞"
+      regex: true
+      pattern: "JavaScriptSerializer"
+      patterns:
+        - "JavaScriptSerializer"
+        - "TypeResolver\\s*="
+      matchLogic: "AND"
+    
+    # JSON.NET TypeNameHandling
+    - name: "JSON.NET不安全的TypeNameHandling"
+      function: "JsonConvert TypeNameHandling"
+      description: "JSON.NET使用TypeNameHandling.All/Objects/Auto可能导致反序列化漏洞"
+      regex: true
+      pattern: "TypeNameHandling"
+      patterns:
+        - "TypeNameHandling"
+        - "TypeNameHandling\\.All|TypeNameHandling\\.Objects|TypeNameHandling\\.Auto"
+      matchLogic: "AND"
+    
+    # XmlSerializer 外部实体注入
+    - name: "XmlSerializer反序列化风险"
+      function: "XmlSerializer"
+      description: "XmlSerializer反序列化不可信XML可能导致XXE或反序列化攻击"
+      regex: true
+      pattern: "XmlSerializer"
+      patterns:
+        - "XmlSerializer"
+        - "\\.Deserialize\\s*\\("
+        - "Request\\.|HttpContext\\.|FromBody"  # 来自用户输入
+      matchLogic: "AND"
+    
+    # ViewState MAC 禁用
+    - name: "ViewState MAC禁用"
+      function: "EnableViewStateMac"
+      description: "禁用ViewState MAC验证可导致反序列化攻击"
+      regex: true
+      pattern: "EnableViewStateMac\\s*=\\s*false"
+    
+    # Process.Start命令执行
     - name: "Process.Start命令执行"
       function: "Process.Start("
       description: "执行系统命令，可能存在命令注入风险"

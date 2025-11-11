@@ -468,6 +468,12 @@ rules:
       regex: true
       pattern: "Files\\.readString\\s*\\("
       
+    - name: "Files.lines文件读取"
+      function: "Files.lines("
+      description: "按行读取文件流，注意路径验证"
+      regex: true
+      pattern: "Files\\.lines\\s*\\("
+      
     - name: "Files.move文件移动"
       function: "Files.move("
       description: "移动文件，注意路径验证"
@@ -539,6 +545,12 @@ rules:
       description: "文件字符流读取，注意路径验证"
       regex: true
       pattern: "new\\s+FileReader\\s*\\("
+      
+    - name: "Scanner文件读取"
+      function: "new Scanner("
+      description: "Scanner文件读取，注意路径验证防止路径遍历"
+      regex: true
+      pattern: "new\\s+Scanner\\s*\\("
       
     - name: "FileWriter文件写入"
       function: "FileWriter"

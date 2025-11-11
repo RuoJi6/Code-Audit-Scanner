@@ -141,7 +141,7 @@ rules:
       function: "Statement.execute("
       description: "直接执行SQL，可能存在SQL注入风险"
       regex: true
-      pattern: "Statement.*\\.execute\\w*\\s*\\("
+      pattern: "\\.execute\\s*\\("
       
     - name: "JDBC查询"
       function: "createStatement("
@@ -299,29 +299,17 @@ rules:
       regex: true
       pattern: "NamingEnumeration"
       
-    - name: "PreparedStatement.executeQuery SQL"
-      function: "PreparedStatement.executeQuery("
-      description: "预编译SQL查询，注意参数化查询"
+    - name: "executeQuery SQL注入"
+      function: "executeQuery("
+      description: "SQL查询，可能存在SQL注入风险。具体是PreparedStatement(预编译SQL查询)还是Statement(普通SQL查询)请查看代码中实例化对象"
       regex: true
-      pattern: "PreparedStatement.*\\.executeQuery\\s*\\("
+      pattern: "\\.executeQuery\\s*\\("
       
-    - name: "PreparedStatement.executeUpdate SQL"
-      function: "PreparedStatement.executeUpdate("
-      description: "预编译SQL更新，注意参数化查询"
+    - name: "executeUpdate SQL注入"
+      function: "executeUpdate("
+      description: "SQL更新，可能存在SQL注入风险。具体是PreparedStatement(预编译SQL更新)还是Statement(普通SQL更新)请查看代码中实例化对象"
       regex: true
-      pattern: "PreparedStatement.*\\.executeUpdate\\s*\\("
-      
-    - name: "Statement.executeQuery SQL注入"
-      function: "Statement.executeQuery("
-      description: "SQL查询，可能存在SQL注入风险"
-      regex: true
-      pattern: "Statement.*\\.executeQuery\\s*\\("
-      
-    - name: "Statement.executeUpdate SQL注入"
-      function: "Statement.executeUpdate("
-      description: "SQL更新，可能存在SQL注入风险"
-      regex: true
-      pattern: "Statement.*\\.executeUpdate\\s*\\("
+      pattern: "\\.executeUpdate\\s*\\("
       
     - name: "createNativeQuery SQL注入"
       function: "createNativeQuery("
@@ -396,11 +384,17 @@ rules:
       regex: true
       pattern: "\\.parseRequest\\s*\\("
       
-    - name: "文件上传isMultipartContent"
-      function: "isMultipartContent("
+    - name: "文件上传ServletFileUpload.isMultipartContent"
+      function: "ServletFileUpload.isMultipartContent("
       description: "检查请求是否为多部分内容（文件上传）"
       regex: true
-      pattern: "isMultipartContent\\s*\\("
+      pattern: "ServletFileUpload\\.isMultipartContent"
+      
+    - name: "文件上传new ServletFileUpload"
+      function: "new ServletFileUpload("
+      description: "创建ServletFileUpload对象用于处理文件上传，注意文件大小和类型验证"
+      regex: true
+      pattern: "new\\s+ServletFileUpload\\s*\\("
       
     - name: "文件上传mkdir"
       function: "mkdir("
@@ -419,6 +413,12 @@ rules:
       description: "路径拼接用于文件上传，注意文件名验证防止路径遍历"
       regex: true
       pattern: "\\.resolve\\s*\\("
+      
+    - name: "Spring文件上传MultipartFile.getOriginalFilename"
+      function: "getOriginalFilename("
+      description: "获取上传文件的原始文件名，注意文件名验证防止路径遍历"
+      regex: true
+      pattern: "\\.getOriginalFilename\\s*\\("
       
     - name: "文件操作new File"
       function: "new File("

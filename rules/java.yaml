@@ -372,6 +372,24 @@ rules:
       regex: true
       pattern: "MultipartFile.*\\.transferTo\\s*\\("
       
+    - name: "文件上传getRealPath"
+      function: "getServletContext().getRealPath("
+      description: "获取Servlet上下文真实路径用于文件上传，注意路径验证防止路径遍历"
+      regex: true
+      pattern: "getServletContext\\(\\)\\.getRealPath\\s*\\("
+      
+    - name: "文件上传FileItem.write"
+      function: "item.write("
+      description: "FileItem写入文件，注意文件名验证防止路径遍历和文件覆盖"
+      regex: true
+      pattern: "\\w+\\.write\\s*\\(\\s*\\w+"
+      
+    - name: "文件操作new File"
+      function: "new File("
+      description: "创建File对象，注意路径验证防止路径遍历，特别是在文件上传场景中"
+      regex: true
+      pattern: "new\\s+File\\s*\\("
+      
     - name: "文件读取FileInputStream"
       function: "FileInputStream"
       description: "文件输入流，注意路径验证防止路径遍历"

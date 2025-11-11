@@ -370,19 +370,55 @@ rules:
       function: "MultipartFile.transferTo("
       description: "文件上传，注意文件类型和路径验证"
       regex: true
-      pattern: "MultipartFile.*\\.transferTo\\s*\\("
+      pattern: "\\.transferTo\\s*\\("
+      
+    - name: "文件上传Paths.get"
+      function: "Paths.get("
+      description: "获取路径对象用于文件上传，注意路径验证防止路径遍历"
+      regex: true
+      pattern: "Paths\\.get\\s*\\("
       
     - name: "文件上传getRealPath"
       function: "getServletContext().getRealPath("
       description: "获取Servlet上下文真实路径用于文件上传，注意路径验证防止路径遍历"
       regex: true
-      pattern: "getServletContext\\(\\)\\.getRealPath\\s*\\("
+      pattern: "getServletContext\\(\\)\\.getRealPath"
       
     - name: "文件上传FileItem.write"
       function: "item.write("
       description: "FileItem写入文件，注意文件名验证防止路径遍历和文件覆盖"
       regex: true
-      pattern: "\\w+\\.write\\s*\\(\\s*\\w+"
+      pattern: "\\.write\\s*\\("
+      
+    - name: "文件上传parseRequest"
+      function: "parseRequest("
+      description: "解析文件上传请求，注意文件大小和类型验证"
+      regex: true
+      pattern: "\\.parseRequest\\s*\\("
+      
+    - name: "文件上传isMultipartContent"
+      function: "isMultipartContent("
+      description: "检查请求是否为多部分内容（文件上传）"
+      regex: true
+      pattern: "isMultipartContent\\s*\\("
+      
+    - name: "文件上传mkdir"
+      function: "mkdir("
+      description: "创建目录，注意路径验证防止目录遍历"
+      regex: true
+      pattern: "\\.mkdir\\s*\\("
+      
+    - name: "文件上传mkdirs"
+      function: "mkdirs("
+      description: "创建多级目录，注意路径验证防止目录遍历"
+      regex: true
+      pattern: "\\.mkdirs\\s*\\("
+      
+    - name: "文件上传Path.resolve"
+      function: "resolve("
+      description: "路径拼接用于文件上传，注意文件名验证防止路径遍历"
+      regex: true
+      pattern: "\\.resolve\\s*\\("
       
     - name: "文件操作new File"
       function: "new File("

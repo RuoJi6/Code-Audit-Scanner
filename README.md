@@ -10,7 +10,7 @@
 <br/>
 <br/>
 
-[使用文档](https://github.com/RuoJi6/Code-Audit-Scanner/blob/main/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md)
+[使用文档](https://github.com/RuoJi6/Code-Audit-Scanner/blob/main/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md) ｜ [规则编写](https://github.com/RuoJi6/Code-Audit-Scanner/blob/main/RULES.md)
 
 # Code-Audit-Scanner
 jetbrains 编辑器代码审计插件，是一款结合多种正则表达式的插件，其中用户可以通过定多种不同的规则，以及条件，来挖掘漏洞。

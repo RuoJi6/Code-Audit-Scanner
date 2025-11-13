@@ -20,13 +20,13 @@ rules:
       function: "ScriptEngine"
       description: "执行脚本代码，可能存在代码注入风险"
       regex: true
-      pattern: "ScriptEngine\\s+(\\w+)\\s*="
+      pattern: "ScriptEngine\\s+(\\w+)"
 
     - name: "Method反射调用"
       function: "Method"
       description: "反射调用方法，可能被利用执行任意代码"
       regex: true
-      pattern: "Method\\s+(\\w+)\\s*="
+      pattern: "Method\\s+(\\w+)"
 
     - name: "new URLClassLoader动态加载"
       function: "new URLClassLoader("
@@ -50,7 +50,7 @@ rules:
       function: "ClassLoader"
       description: "类加载器加载类，可能加载恶意类"
       regex: true
-      pattern: "ClassLoader\\s+(\\w+)\\s*="
+      pattern: "ClassLoader\\s+(\\w+)"
 
     - name: "Unsafe反射获取"
       function: "Unsafe"
@@ -62,7 +62,7 @@ rules:
       function: "Constructor"
       description: "反射创建对象实例，可能被利用执行任意代码"
       regex: true
-      pattern: "Constructor(<[^>]+>)?\\s+(\\w+)\\s*="
+      pattern: "Constructor(<[^>]+>)?\\s+(\\w+)"
 
     - name: "TemplatesImpl模板注入"
       function: "TemplatesImpl"
@@ -92,7 +92,7 @@ rules:
       function: "Expression"
       description: "SpEL表达式求值，可能存在SpEL注入"
       regex: true
-      pattern: "Expression\\s+(\\w+)\\s*="
+      pattern: "Expression\\s+(\\w+)"
 
     - name: "eval代码执行"
       function: ".eval("
@@ -225,7 +225,7 @@ rules:
       function: "DocumentBuilderFactory"
       description: "XML解析，可能存在XXE漏洞"
       regex: true
-      pattern: "DocumentBuilderFactory\\s+(\\w+)\\s*="
+      pattern: "DocumentBuilderFactory\\s+(\\w+)"
       
     - name: "new SpelExpressionParser表达式注入"
       function: "new SpelExpressionParser("
@@ -369,25 +369,25 @@ rules:
       function: "XPathExpression"
       description: "XPath表达式求值，可能存在XPath注入"
       regex: true
-      pattern: "XPathExpression\\s+(\\w+)\\s*="
+      pattern: "XPathExpression\\s+(\\w+)"
 
     - name: "DirContext LDAP"
       function: "DirContext"
       description: "LDAP目录搜索，可能存在LDAP注入"
       regex: true
-      pattern: "DirContext\\s+(\\w+)\\s*="
+      pattern: "DirContext\\s+(\\w+)"
 
     - name: "LdapContext LDAP"
       function: "LdapContext"
       description: "LDAP上下文搜索，可能存在LDAP注入"
       regex: true
-      pattern: "LdapContext\\s+(\\w+)\\s*="
+      pattern: "LdapContext\\s+(\\w+)"
 
     - name: "NamingEnumeration LDAP"
       function: "NamingEnumeration"
       description: "LDAP命名枚举，注意LDAP注入"
       regex: true
-      pattern: "NamingEnumeration(<[^>]+>)?\\s+(\\w+)\\s*="
+      pattern: "NamingEnumeration(<[^>]+>)?\\s+(\\w+)"
       
     - name: "executeQuery SQL注入"
       function: "executeQuery("
@@ -411,31 +411,31 @@ rules:
       function: "EntityManager"
       description: "创建JPQL/HQL查询，注意注入风险"
       regex: true
-      pattern: "EntityManager\\s+(\\w+)\\s*="
+      pattern: "EntityManager\\s+(\\w+)"
 
     - name: "Session Hibernate"
       function: "Session"
       description: "Hibernate查询，注意HQL/SQL注入风险"
       regex: true
-      pattern: "Session\\s+(\\w+)\\s*="
+      pattern: "Session\\s+(\\w+)"
 
     - name: "MongoDatabase NoSQL"
       function: "MongoDatabase"
       description: "MongoDB命令执行，注意NoSQL注入"
       regex: true
-      pattern: "MongoDatabase\\s+(\\w+)\\s*="
+      pattern: "MongoDatabase\\s+(\\w+)"
 
     - name: "MongoCollection NoSQL"
       function: "MongoCollection"
       description: "MongoDB查询，注意NoSQL注入"
       regex: true
-      pattern: "MongoCollection(<[^>]+>)?\\s+(\\w+)\\s*="
+      pattern: "MongoCollection(<[^>]+>)?\\s+(\\w+)"
 
     - name: "RedisTemplate Redis"
       function: "RedisTemplate"
       description: "Redis命令执行，注意命令注入"
       regex: true
-      pattern: "RedisTemplate(<[^>]+>)?\\s+(\\w+)\\s*="
+      pattern: "RedisTemplate(<[^>]+>)?\\s+(\\w+)"
 
     - name: "createSQLQuery SQL注入"
       function: ".createSQLQuery("
@@ -850,13 +850,13 @@ rules:
       function: "RequestDispatcher"
       description: "包含资源，注意路径验证"
       regex: true
-      pattern: "RequestDispatcher\\s+(\\w+)\\s*="
+      pattern: "RequestDispatcher\\s+(\\w+)"
 
     - name: "URLConnection URL连接"
       function: "URLConnection"
       description: "URL连接，注意SSRF风险"
       regex: true
-      pattern: "URLConnection\\s+(\\w+)\\s*="
+      pattern: "URLConnection\\s+(\\w+)"
 
     - name: "include包含"
       function: ".include("
@@ -880,7 +880,7 @@ rules:
       function: "HttpURLConnection"
       description: "HTTP URL连接，注意SSRF风险"
       regex: true
-      pattern: "HttpURLConnection\\s+(\\w+)\\s*="
+      pattern: "HttpURLConnection\\s+(\\w+)"
 
     - name: "new OkHttpClient HTTP请求"
       function: "new OkHttpClient("
@@ -976,7 +976,7 @@ rules:
       function: "JavaMailSender"
       description: "发送邮件，注意邮件头注入"
       regex: true
-      pattern: "JavaMailSender\\s+(\\w+)\\s*="
+      pattern: "JavaMailSender\\s+(\\w+)"
 
     - name: "new MimeMessage邮件消息"
       function: "new MimeMessage("
@@ -1103,13 +1103,13 @@ rules:
       function: "Runtime"
       description: "Runtime运行时类，可能泄露系统信息"
       regex: true
-      pattern: "Runtime\\s+(\\w+)\\s*="
+      pattern: "Runtime\\s+(\\w+)"
 
     - name: "InetAddress网络地址"
       function: "InetAddress"
       description: "InetAddress网络地址类，可能泄露主机信息"
       regex: true
-      pattern: "InetAddress\\s+(\\w+)\\s*="
+      pattern: "InetAddress\\s+(\\w+)"
 
     - name: "availableProcessors处理器数"
       function: ".availableProcessors("
@@ -1169,19 +1169,19 @@ rules:
       function: "Thread"
       description: "Thread线程类"
       regex: true
-      pattern: "Thread\\s+(\\w+)\\s*="
+      pattern: "Thread\\s+(\\w+)"
 
     - name: "Exception异常"
       function: "Exception"
       description: "Exception异常类，可能泄露敏感信息"
       regex: true
-      pattern: "Exception\\s+(\\w+)\\s*="
+      pattern: "Exception\\s+(\\w+)"
 
     - name: "Throwable异常"
       function: "Throwable"
       description: "Throwable异常类，可能泄露路径信息"
       regex: true
-      pattern: "Throwable\\s+(\\w+)\\s*="
+      pattern: "Throwable\\s+(\\w+)"
 
     - name: "getClassLoader类加载器"
       function: ".getClassLoader("
@@ -1217,13 +1217,13 @@ rules:
       function: "Field"
       description: "Field反射字段类"
       regex: true
-      pattern: "Field\\s+(\\w+)\\s*="
+      pattern: "Field\\s+(\\w+)"
 
     - name: "AccessibleObject反射访问"
       function: "AccessibleObject"
       description: "AccessibleObject反射访问类，绕过访问控制"
       regex: true
-      pattern: "AccessibleObject\\s+(\\w+)\\s*="
+      pattern: "AccessibleObject\\s+(\\w+)"
 
     - name: "getDeclaredFields反射字段"
       function: ".getDeclaredFields("
@@ -1283,7 +1283,7 @@ rules:
       function: "Path"
       description: "Path路径类"
       regex: true
-      pattern: "Path\\s+(\\w+)\\s*="
+      pattern: "Path\\s+(\\w+)"
 
     - name: "exists文件检查"
       function: ".exists("

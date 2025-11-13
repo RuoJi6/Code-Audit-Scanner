@@ -4,6 +4,34 @@
 
 本项目包含了针对多种编程语言的代码安全审计规则集，用于自动化检测代码中的安全漏洞和风险点。
 
+### 📊 规则统计
+
+| 语言 | 规则数量 | 文件名 |
+|------|---------|--------|
+| Java | 223 | `java.yaml` |
+| .NET/C# | 180 | `net.yaml` |
+| Python | 199 | `python.yaml` |
+| PHP | 162 | `php.yaml` |
+| JavaScript/Node.js | 199 | `js.yaml` |
+| SQL | 61 | `sql.yaml` |
+| **总计** | **1024** | - |
+
+### 🎨 特性支持
+
+| 特性 | Java | .NET | Python | PHP | JavaScript | SQL |
+|------|------|------|--------|-----|------------|-----|
+| 正则匹配 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 精确匹配 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 全词匹配 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 大小写控制 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 多模式匹配 | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| AND/OR 逻辑 | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+
+**说明**：
+- ✅ 所有语言都支持基本的三种匹配类型和大小写控制
+- ✅ .NET 规则集广泛使用多模式匹配（13个规则使用 AND 逻辑）
+- ⚠️ 其他语言暂未使用多模式匹配，但代码层面已支持
+
 ## 🎯 风险等级分类
 
 所有规则按照风险等级分为四个级别：
@@ -67,9 +95,11 @@ rules:
 | `name` | String | ✅ | 规则的显示名称 |
 | `function` | String | ✅ | 要检测的函数/方法名称 |
 | `description` | String | ✅ | 规则的详细描述，说明风险点 |
-| `regex` | Boolean | ✅ | 是否使用正则表达式匹配 |
-| `pattern` | String | ✅ | 匹配模式（正则或字符串） |
+| `regex` | Int/Boolean | ✅ | 匹配类型：1/true=正则，2/false=精确，3=全词 |
+| `pattern` | String | ✅ | 单个匹配模式（正则或字符串） |
 | `caseSensitive` | Boolean | ❌ | 是否区分大小写（默认true） |
+| `patterns` | List<String> | ❌ | 多个匹配模式（高级功能） |
+| `matchLogic` | String | ❌ | 多模式匹配逻辑："AND"或"OR"（默认OR） |
 
 ## 🔍 匹配类型说明
 
@@ -484,21 +514,305 @@ val regex = when (val regexValue = ruleMap["regex"]) {
 - 全词匹配 = 自动添加 `\b` + 自动转义特殊字符
 - 如果你需要更复杂的模式，应该使用正则匹配而不是全词匹配
 
-### 高级格式（.NET规则）
+---
 
-.NET规则支持多模式匹配：
+## 🔥 高级特性：多模式匹配
+
+### 1. caseSensitive - 大小写敏感控制
+
+所有三种匹配类型都支持 `caseSensitive` 字段：
+
+```yaml
+# 区分大小写（默认）
+- name: "eval函数"
+  function: "eval("
+  description: "执行代码"
+  regex: 1
+  pattern: "eval\\s*\\("
+  caseSensitive: true  # 默认值，可以不写
+
+# 不区分大小写
+- name: "eval函数（不区分大小写）"
+  function: "eval("
+  description: "执行代码"
+  regex: 1
+  pattern: "eval\\s*\\("
+  caseSensitive: false  # 匹配 eval、Eval、EVAL 等
+```
+
+**代码实现**：
+```kotlin
+// 正则匹配
+val regexPattern = if (caseSensitive) {
+    pattern.toRegex()
+} else {
+    pattern.toRegex(RegexOption.IGNORE_CASE)
+}
+
+// 精确匹配
+code.contains(pattern, ignoreCase = !caseSensitive)
+
+// 全词匹配
+val wordBoundaryPattern = if (caseSensitive) {
+    "\\b${Regex.escape(pattern)}\\b".toRegex()
+} else {
+    "\\b${Regex.escape(pattern)}\\b".toRegex(RegexOption.IGNORE_CASE)
+}
+```
+
+**匹配示例**：
+```java
+// caseSensitive: false
+// pattern: "eval\\s*\\("
+
+// ✅ 都会匹配
+eval("code");
+Eval("code");
+EVAL("code");
+eVaL("code");
+```
+
+---
+
+### 2. 多模式匹配（patterns + matchLogic）
+
+支持在一个规则中定义多个匹配模式，并通过 `matchLogic` 控制逻辑关系。
+
+#### 基本格式
 
 ```yaml
 - name: "规则名称"
   function: "函数名"
   description: "描述"
-  regex: true
-  pattern: "主模式"  # 向后兼容
-  patterns:
+  regex: 1  # 匹配类型
+  pattern: "主模式"  # 向后兼容，可选
+  patterns:  # 多个模式
     - "模式1"
     - "模式2"
     - "模式3"
   matchLogic: "AND"  # AND: 所有模式都必须匹配; OR: 任意模式匹配（默认）
+  caseSensitive: true  # 可选，默认true
+```
+
+#### matchLogic 说明
+
+| matchLogic 值 | 匹配逻辑 | 说明 |
+|--------------|---------|------|
+| `"OR"` | 任意模式匹配 | 只要有一个模式匹配就算匹配（默认） |
+| `"AND"` | 所有模式都匹配 | 所有模式都必须匹配才算匹配 |
+
+**代码实现**：
+```kotlin
+when (matchLogic) {
+    MatchLogic.AND -> {
+        // AND 逻辑：所有模式都必须匹配
+        patternsToMatch.all { pattern ->
+            matchSinglePattern(code, pattern)
+        }
+    }
+    MatchLogic.OR -> {
+        // OR 逻辑：任意一个模式匹配即可
+        patternsToMatch.any { pattern ->
+            matchSinglePattern(code, pattern)
+        }
+    }
+}
+```
+
+---
+
+### 3. 多模式匹配实战示例
+
+#### 示例1：OR 逻辑 - 检测多种危险函数
+
+```yaml
+- name: "命令执行函数"
+  function: "exec/system/shell_exec"
+  description: "检测多种命令执行函数"
+  regex: 1
+  patterns:
+    - "\\bexec\\s*\\("
+    - "\\bsystem\\s*\\("
+    - "\\bshell_exec\\s*\\("
+  matchLogic: "OR"  # 任意一个匹配即可
+```
+
+**匹配结果**：
+```php
+// ✅ 匹配（包含 exec）
+exec("ls -la");
+
+// ✅ 匹配（包含 system）
+system("whoami");
+
+// ✅ 匹配（包含 shell_exec）
+shell_exec("cat /etc/passwd");
+```
+
+#### 示例2：AND 逻辑 - 检测复杂的漏洞模式
+
+```yaml
+- name: "BinaryFormatter不安全反序列化"
+  function: "BinaryFormatter.Deserialize"
+  description: "检测BinaryFormatter的Deserialize调用"
+  regex: 1
+  patterns:
+    - "BinaryFormatter"  # 必须包含 BinaryFormatter
+    - "\\.Deserialize\\s*\\("  # 必须包含 .Deserialize( 调用
+  matchLogic: "AND"  # 两个模式都必须匹配
+```
+
+**匹配结果**：
+```csharp
+// ✅ 匹配（同时包含两个模式）
+BinaryFormatter formatter = new BinaryFormatter();
+object obj = formatter.Deserialize(stream);
+
+// ❌ 不匹配（只有 BinaryFormatter，没有 Deserialize）
+BinaryFormatter formatter = new BinaryFormatter();
+
+// ❌ 不匹配（只有 Deserialize，没有 BinaryFormatter）
+formatter.Deserialize(stream);
+```
+
+#### 示例3：AND 逻辑 - 检测特定上下文的漏洞
+
+```yaml
+- name: "AjaxMethod中的危险类型转换"
+  function: "AjaxMethod + Convert"
+  description: "检测AjaxMethod中对object参数进行类型转换"
+  regex: 1
+  patterns:
+    - "\\[AjaxMethod\\]"  # 必须有 AjaxMethod 特性
+    - "\\bobject\\b"  # 必须有 object 类型参数
+    - "Convert\\."  # 必须有类型转换操作
+  matchLogic: "AND"  # 三者必须同时出现
+```
+
+**匹配结果**：
+```csharp
+// ✅ 匹配（三个模式都存在）
+[AjaxMethod]
+public string ProcessData(object data)
+{
+    string result = Convert.ToString(data);
+    return result;
+}
+
+// ❌ 不匹配（缺少 AjaxMethod 特性）
+public string ProcessData(object data)
+{
+    string result = Convert.ToString(data);
+    return result;
+}
+
+// ❌ 不匹配（缺少 Convert 操作）
+[AjaxMethod]
+public string ProcessData(object data)
+{
+    return data.ToString();
+}
+```
+
+#### 示例4：复杂的 OR 模式 - 检测多种序列化器
+
+```yaml
+- name: "不安全的序列化器"
+  function: "Unsafe Serializers"
+  description: "检测多种不安全的序列化器"
+  regex: 1
+  patterns:
+    - "BinaryFormatter"
+    - "ObjectStateFormatter"
+    - "LosFormatter"
+    - "SoapFormatter"
+    - "NetDataContractSerializer"
+  matchLogic: "OR"  # 任意一个出现即报告
+```
+
+---
+
+### 4. 多模式匹配的优势
+
+✅ **减少规则数量**：
+- 不需要为每个危险函数创建单独的规则
+- 一个规则可以检测多种相似的模式
+
+✅ **提高准确性**：
+- AND 逻辑可以减少误报
+- 只有满足所有条件才报告
+
+✅ **灵活的组合**：
+- 可以组合不同的模式
+- 适应复杂的漏洞检测场景
+
+✅ **易于维护**：
+- 相关的模式集中在一起
+- 修改更方便
+
+---
+
+### 5. 多模式匹配的注意事项
+
+⚠️ **AND 逻辑的限制**：
+- 所有模式必须在**同一个文件**中匹配
+- 不支持跨文件匹配
+- 适合检测同一代码段中的多个特征
+
+⚠️ **性能考虑**：
+- AND 逻辑需要检查所有模式
+- 模式越多，性能开销越大
+- 建议将最具特征性的模式放在前面
+
+⚠️ **正则表达式复杂度**：
+- 每个 pattern 都是独立的正则表达式
+- 避免过于复杂的正则
+- 优先使用简单、高效的模式
+
+---
+
+### 6. 实际应用场景
+
+#### .NET 反序列化检测（使用最多）
+
+```yaml
+# 检测 13 种不同的反序列化模式
+critical:
+  - name: "BinaryFormatter不安全反序列化"
+    patterns:
+      - "BinaryFormatter"
+      - "\\.Deserialize\\s*\\("
+    matchLogic: "AND"
+
+  - name: "NetDataContractSerializer反序列化"
+    patterns:
+      - "NetDataContractSerializer"
+      - "\\.Deserialize\\s*\\(|\\.ReadObject\\s*\\("
+    matchLogic: "AND"
+
+  # ... 更多反序列化规则
+```
+
+#### Java 反射调用检测
+
+```yaml
+critical:
+  - name: "Method.invoke反射调用"
+    patterns:
+      - "Method\\s+(\\w+)"  # Method 变量声明
+      - "\\.invoke\\s*\\("  # invoke 方法调用
+    matchLogic: "AND"
+```
+
+#### PHP 文件包含检测
+
+```yaml
+high:
+  - name: "动态文件包含"
+    patterns:
+      - "include\\s*\\(|require\\s*\\("  # include/require
+      - "\\$_GET|\\$_POST|\\$_REQUEST"  # 用户输入
+    matchLogic: "AND"
 ```
 
 ## 🔍 正则表达式模式说明
@@ -762,6 +1076,109 @@ MongoCollection<Document> collection = db.getCollection();  // ✅ 匹配
 
 ---
 
+## 🧪 规则测试功能
+
+工具内置了规则测试功能，可以在添加或修改规则时进行测试。
+
+### 测试界面
+
+在规则编辑器中点击"测试正则"按钮，可以：
+
+1. **输入测试代码**：在文本框中输入要测试的代码
+2. **查看匹配结果**：显示是否匹配以及匹配的位置
+3. **验证匹配类型**：测试精确匹配、正则匹配、全词匹配
+4. **验证大小写**：测试 caseSensitive 设置是否正确
+
+### 测试示例
+
+#### 测试正则匹配
+
+```yaml
+# 规则配置
+regex: 1
+pattern: "eval\\s*\\("
+caseSensitive: true
+```
+
+**测试代码**：
+```javascript
+eval("code");
+eval ("code");
+eval  ("code");
+```
+
+**测试结果**：
+```
+✅ [正则模式] 找到 3 处匹配:
+
+匹配 1: eval(
+位置: 0..5
+
+匹配 2: eval (
+位置: 15..21
+
+匹配 3: eval  (
+位置: 32..39
+```
+
+#### 测试全词匹配
+
+```yaml
+# 规则配置
+regex: 3
+pattern: "eval"
+caseSensitive: false
+```
+
+**测试代码**：
+```javascript
+eval("code");
+Eval("code");
+evaluation();
+```
+
+**测试结果**：
+```
+✅ [全词模式] 找到 2 处匹配:
+
+匹配 1: eval
+位置: 0..4
+
+匹配 2: Eval
+位置: 15..19
+
+提示：evaluation() 不会被匹配（不是完整单词）
+```
+
+#### 测试多模式匹配
+
+```yaml
+# 规则配置
+regex: 1
+patterns:
+  - "BinaryFormatter"
+  - "\\.Deserialize\\s*\\("
+matchLogic: "AND"
+```
+
+**测试代码**：
+```csharp
+BinaryFormatter formatter = new BinaryFormatter();
+object obj = formatter.Deserialize(stream);
+```
+
+**测试结果**：
+```
+✅ [AND 逻辑] 所有模式都匹配:
+
+模式 1: BinaryFormatter ✅
+模式 2: \.Deserialize\s*\( ✅
+
+结论：规则匹配成功
+```
+
+---
+
 ## 🛠️ 使用建议
 
 ### 1. 规则优先级
@@ -780,6 +1197,7 @@ MongoCollection<Document> collection = db.getCollection();  // ✅ 匹配
 - 人工审查所有 Critical 和 High 级别的检测结果
 - 对于确认的误报，可以在代码中添加注释说明
 - 考虑上下文，判断是否真的存在安全风险
+- 使用规则测试功能验证规则的准确性
 
 ### 3. 规则定制
 
@@ -789,6 +1207,7 @@ MongoCollection<Document> collection = db.getCollection();  // ✅ 匹配
 - 添加项目特定的规则
 - 禁用不适用的规则
 - 修改正则表达式以提高准确性
+- 使用多模式匹配减少误报
 
 ### 4. 最佳实践
 
@@ -796,6 +1215,134 @@ MongoCollection<Document> collection = db.getCollection();  // ✅ 匹配
 - **集成到CI/CD**：将代码审计集成到持续集成流程中
 - **培训开发人员**：让开发人员了解常见的安全问题
 - **结合其他工具**：代码审计工具应与其他安全测试工具配合使用
+- **使用测试功能**：在添加新规则前，务必使用测试功能验证
+
+---
+
+## ❓ 常见问题（FAQ）
+
+### Q1: regex 字段应该写 true/false 还是 1/2/3？
+
+**A**: 推荐使用新格式（数字）：
+- `regex: 1` - 正则匹配
+- `regex: 2` - 精确匹配
+- `regex: 3` - 全词匹配
+
+旧格式（Boolean）仍然支持，但无法表示全词匹配：
+- `regex: true` → 转换为 1（正则匹配）
+- `regex: false` → 转换为 2（精确匹配）
+
+### Q2: 什么时候使用全词匹配（regex: 3）？
+
+**A**: 全词匹配适合以下场景：
+- ✅ 匹配单个关键字：`eval`, `exec`, `system`
+- ✅ 避免误报：匹配 `eval` 但不匹配 `evaluation`
+- ❌ 不适合复杂模式：`Runtime.getRuntime().exec(`（应使用正则匹配）
+
+### Q3: caseSensitive 默认值是什么？
+
+**A**: 默认值是 `true`（区分大小写）。如果不写 `caseSensitive` 字段，规则会区分大小写。
+
+```yaml
+# 这两个配置是等价的
+- name: "eval函数"
+  pattern: "eval("
+  # 默认 caseSensitive: true
+
+- name: "eval函数"
+  pattern: "eval("
+  caseSensitive: true  # 明确指定
+```
+
+### Q4: 多模式匹配的 AND 逻辑是如何工作的？
+
+**A**: AND 逻辑要求所有模式都在**同一个文件**中匹配：
+
+```yaml
+patterns:
+  - "BinaryFormatter"
+  - "\\.Deserialize\\s*\\("
+matchLogic: "AND"
+```
+
+只有当文件中**同时包含**这两个模式时才会报告。不支持跨文件匹配。
+
+### Q5: 为什么我的正则表达式不工作？
+
+**A**: 常见原因：
+1. **忘记转义特殊字符**：`.` 应写成 `\\.`，`(` 应写成 `\\(`
+2. **YAML 转义问题**：在 YAML 中，`\` 需要写成 `\\`
+3. **regex 字段设置错误**：确保 `regex: 1`（不是 `regex: 2` 或 `regex: false`）
+
+**正确示例**：
+```yaml
+regex: 1
+pattern: "Runtime\\.getRuntime\\(\\)\\.exec\\s*\\("
+```
+
+**错误示例**：
+```yaml
+regex: 2  # ❌ 这是精确匹配，不是正则匹配
+pattern: "Runtime.getRuntime().exec("  # ❌ 没有转义特殊字符
+```
+
+### Q6: 如何测试我的规则是否正确？
+
+**A**: 使用内置的规则测试功能：
+1. 在规则编辑器中点击"测试正则"按钮
+2. 输入测试代码
+3. 查看匹配结果
+4. 根据结果调整规则
+
+### Q7: 多模式匹配会影响性能吗？
+
+**A**:
+- **OR 逻辑**：性能影响较小，找到第一个匹配就返回
+- **AND 逻辑**：需要检查所有模式，性能开销稍大
+- **建议**：将最具特征性的模式放在前面，可以提前终止匹配
+
+### Q8: 可以在一个规则中混用不同的匹配类型吗？
+
+**A**: 不可以。一个规则只能有一个 `regex` 值，所有 patterns 都使用相同的匹配类型。
+
+如果需要不同的匹配类型，应该创建多个规则。
+
+### Q9: pattern 和 patterns 有什么区别？
+
+**A**:
+- `pattern`：单个匹配模式（字符串）
+- `patterns`：多个匹配模式（字符串数组）
+
+如果同时定义了两者：
+- 使用 `patterns` 进行匹配
+- `pattern` 仅用于向后兼容和显示
+
+**推荐做法**：
+- 单模式匹配：只写 `pattern`
+- 多模式匹配：写 `patterns`（可选写 `pattern` 作为主模式）
+
+### Q10: 如何为新语言添加规则？
+
+**A**:
+1. 在 `src/main/resources/rules/` 目录创建新的 YAML 文件
+2. 按照标准格式编写规则
+3. 在 `RuleManager.kt` 中注册新语言
+4. 测试规则是否正常工作
+
+**示例**：
+```yaml
+language: "Go"
+version: "1.0"
+description: "Go 代码审计规则集"
+
+rules:
+  critical:
+    - name: "命令执行"
+      function: "exec.Command"
+      description: "执行系统命令"
+      regex: 1
+      pattern: "exec\\.Command\\s*\\("
+```
 
 ---
 
@@ -825,6 +1372,184 @@ MongoCollection<Document> collection = db.getCollection();  // ✅ 匹配
 
 ---
 
+## 📐 规则编写最佳实践
+
+### 1. 选择合适的匹配类型
+
+| 场景 | 推荐匹配类型 | 示例 |
+|------|------------|------|
+| 固定字符串 | 精确匹配 (regex: 2) | `DROP TABLE` |
+| 需要处理空格 | 正则匹配 (regex: 1) | `eval\s*\(` |
+| 单个关键字 | 全词匹配 (regex: 3) | `eval` |
+| 复杂模式 | 正则匹配 (regex: 1) | `Runtime\.getRuntime\(\)\.exec\s*\(` |
+
+### 2. 正则表达式编写技巧
+
+#### ✅ 好的实践
+
+```yaml
+# 1. 使用 \s* 处理可选空格
+pattern: "eval\\s*\\("  # 匹配 eval( 和 eval (
+
+# 2. 使用 \b 单词边界（或使用全词匹配）
+pattern: "\\beval\\b"  # 只匹配完整的 eval
+
+# 3. 使用 \w+ 匹配变量名
+pattern: "ScriptEngine\\s+(\\w+)"  # 匹配变量声明
+
+# 4. 转义特殊字符
+pattern: "Runtime\\.getRuntime\\(\\)"  # 正确转义 . 和 ()
+
+# 5. 使用可选匹配
+pattern: "(<[^>]+>)?"  # 可选的泛型参数
+```
+
+#### ❌ 避免的错误
+
+```yaml
+# 1. 忘记转义特殊字符
+pattern: "Runtime.getRuntime().exec("  # ❌ . 和 () 有特殊含义
+
+# 2. 过于宽泛的模式
+pattern: ".*eval.*"  # ❌ 会匹配任何包含 eval 的内容
+
+# 3. 过于复杂的正则
+pattern: "(?:(?:public|private|protected)\\s+)?(?:static\\s+)?..."  # ❌ 太复杂
+
+# 4. 不必要的捕获组
+pattern: "(eval)\\s*\\("  # ❌ 不需要捕获 eval
+pattern: "eval\\s*\\("    # ✅ 更简洁
+```
+
+### 3. 减少误报的技巧
+
+#### 技巧1：使用更具体的模式
+
+```yaml
+# ❌ 容易误报
+- name: "ScriptEngine"
+  pattern: "ScriptEngine"  # 会匹配 import、注释等
+
+# ✅ 更精确
+- name: "ScriptEngine"
+  pattern: "ScriptEngine\\s+(\\w+)"  # 只匹配变量声明
+```
+
+#### 技巧2：使用多模式 AND 逻辑
+
+```yaml
+# ✅ 减少误报
+- name: "BinaryFormatter反序列化"
+  patterns:
+    - "BinaryFormatter"
+    - "\\.Deserialize\\s*\\("
+  matchLogic: "AND"  # 两者都存在才报告
+```
+
+#### 技巧3：使用全词匹配
+
+```yaml
+# ❌ 会误报
+- name: "eval函数"
+  regex: 1
+  pattern: "eval"  # 会匹配 evaluation、medieval
+
+# ✅ 不会误报
+- name: "eval函数"
+  regex: 3
+  pattern: "eval"  # 只匹配完整的 eval
+```
+
+### 4. 提高性能的技巧
+
+#### 技巧1：避免回溯
+
+```yaml
+# ❌ 可能导致回溯
+pattern: ".*eval.*"
+
+# ✅ 更高效
+pattern: "eval"  # 使用精确匹配
+```
+
+#### 技巧2：将最具特征性的模式放在前面
+
+```yaml
+# ✅ 好的顺序
+patterns:
+  - "BinaryFormatter"  # 最具特征性
+  - "\\.Deserialize\\s*\\("  # 次要特征
+matchLogic: "AND"
+```
+
+#### 技巧3：使用精确匹配代替正则
+
+```yaml
+# 如果不需要处理空格，使用精确匹配
+- name: "DROP TABLE"
+  regex: 2  # 精确匹配，性能最好
+  pattern: "DROP TABLE"
+```
+
+### 5. 规则命名规范
+
+#### ✅ 好的命名
+
+```yaml
+- name: "Runtime.exec命令执行"  # 清晰描述功能和风险
+- name: "BinaryFormatter不安全反序列化"  # 说明具体问题
+- name: "eval函数代码注入"  # 包含漏洞类型
+```
+
+#### ❌ 不好的命名
+
+```yaml
+- name: "危险函数"  # ❌ 太模糊
+- name: "规则1"  # ❌ 没有意义
+- name: "exec"  # ❌ 只有函数名，没有说明风险
+```
+
+### 6. 描述字段编写规范
+
+#### ✅ 好的描述
+
+```yaml
+description: "执行系统命令，可能存在命令注入风险。应验证输入来源并使用参数化方式执行命令。"
+# 包含：风险说明 + 修复建议
+```
+
+#### ❌ 不好的描述
+
+```yaml
+description: "危险"  # ❌ 太简单
+description: "Runtime.exec"  # ❌ 只重复函数名
+```
+
+### 7. 风险等级划分标准
+
+| 等级 | 标准 | 示例 |
+|------|------|------|
+| **Critical** | 可直接导致 RCE、任意代码执行 | `eval()`, `Runtime.exec()` |
+| **High** | 可能导致数据泄露、SQL注入、XXE | SQL注入、LDAP注入、XXE |
+| **Medium** | 可能导致 SSRF、信息泄露、弱加密 | HTTP请求、弱加密算法 |
+| **Low** | 代码质量问题、潜在风险 | 异常处理、日志记录 |
+
+### 8. 测试规则的检查清单
+
+在提交规则前，确保：
+
+- [ ] 规则名称清晰描述检测内容
+- [ ] 描述字段说明了风险和影响
+- [ ] 选择了合适的匹配类型
+- [ ] 正则表达式正确转义了特殊字符
+- [ ] 使用测试功能验证了规则
+- [ ] 测试了正面案例（应该匹配的代码）
+- [ ] 测试了负面案例（不应该匹配的代码）
+- [ ] 风险等级划分合理
+- [ ] 没有明显的误报
+
+---
+
 ## 🤝 贡献指南
 
 欢迎贡献新的规则或改进现有规则！
@@ -833,14 +1558,16 @@ MongoCollection<Document> collection = db.getCollection();  // ✅ 匹配
 1. Fork 本项目
 2. 创建特性分支
 3. 添加或修改规则
-4. 测试规则准确性
-5. 提交 Pull Request
+4. **使用测试功能验证规则**
+5. 确保遵循规则编写最佳实践
+6. 提交 Pull Request
 
 ### 规则编写规范
 - 规则名称应清晰描述检测内容
 - 描述字段应说明风险类型和影响
 - 正则表达式应尽量精确，避免误报
 - 为新规则添加测试用例
+- 遵循上述"规则编写最佳实践"
 
 ---
 

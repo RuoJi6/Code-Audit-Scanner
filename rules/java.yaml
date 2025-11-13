@@ -20,13 +20,13 @@ rules:
       function: "ScriptEngine"
       description: "执行脚本代码，可能存在代码注入风险"
       regex: true
-      pattern: "ScriptEngine"
+      pattern: "ScriptEngine\\s+(\\w+)\\s*="
 
     - name: "Method反射调用"
       function: "Method"
       description: "反射调用方法，可能被利用执行任意代码"
       regex: true
-      pattern: "\\bMethod\\b"
+      pattern: "Method\\s+(\\w+)\\s*="
 
     - name: "new URLClassLoader动态加载"
       function: "new URLClassLoader("
@@ -50,7 +50,7 @@ rules:
       function: "ClassLoader"
       description: "类加载器加载类，可能加载恶意类"
       regex: true
-      pattern: "ClassLoader"
+      pattern: "ClassLoader\\s+(\\w+)\\s*="
 
     - name: "Unsafe反射获取"
       function: "Unsafe"
@@ -62,19 +62,19 @@ rules:
       function: "Constructor"
       description: "反射创建对象实例，可能被利用执行任意代码"
       regex: true
-      pattern: "\\bConstructor\\b"
+      pattern: "Constructor(<[^>]+>)?\\s+(\\w+)\\s*="
 
     - name: "TemplatesImpl模板注入"
       function: "TemplatesImpl"
       description: "TemplatesImpl类，常用于Java反序列化漏洞利用"
       regex: true
-      pattern: "TemplatesImpl"
+      pattern: "new\\s+TemplatesImpl\\s*\\("
 
     - name: "InvokerTransformer命令执行"
       function: "InvokerTransformer"
       description: "InvokerTransformer类，常用于反序列化攻击链"
       regex: true
-      pattern: "InvokerTransformer"
+      pattern: "new\\s+InvokerTransformer\\s*\\("
 
     - name: "new GroovyShell代码执行"
       function: "new GroovyShell("
@@ -92,7 +92,7 @@ rules:
       function: "Expression"
       description: "SpEL表达式求值，可能存在SpEL注入"
       regex: true
-      pattern: "\\bExpression\\b"
+      pattern: "Expression\\s+(\\w+)\\s*="
 
     - name: "eval代码执行"
       function: ".eval("
@@ -225,7 +225,7 @@ rules:
       function: "DocumentBuilderFactory"
       description: "XML解析，可能存在XXE漏洞"
       regex: true
-      pattern: "DocumentBuilderFactory"
+      pattern: "DocumentBuilderFactory\\s+(\\w+)\\s*="
       
     - name: "new SpelExpressionParser表达式注入"
       function: "new SpelExpressionParser("
@@ -369,25 +369,25 @@ rules:
       function: "XPathExpression"
       description: "XPath表达式求值，可能存在XPath注入"
       regex: true
-      pattern: "XPathExpression"
+      pattern: "XPathExpression\\s+(\\w+)\\s*="
 
     - name: "DirContext LDAP"
       function: "DirContext"
       description: "LDAP目录搜索，可能存在LDAP注入"
       regex: true
-      pattern: "DirContext"
+      pattern: "DirContext\\s+(\\w+)\\s*="
 
     - name: "LdapContext LDAP"
       function: "LdapContext"
       description: "LDAP上下文搜索，可能存在LDAP注入"
       regex: true
-      pattern: "LdapContext"
+      pattern: "LdapContext\\s+(\\w+)\\s*="
 
     - name: "NamingEnumeration LDAP"
       function: "NamingEnumeration"
       description: "LDAP命名枚举，注意LDAP注入"
       regex: true
-      pattern: "NamingEnumeration"
+      pattern: "NamingEnumeration(<[^>]+>)?\\s+(\\w+)\\s*="
       
     - name: "executeQuery SQL注入"
       function: "executeQuery("
@@ -411,31 +411,31 @@ rules:
       function: "EntityManager"
       description: "创建JPQL/HQL查询，注意注入风险"
       regex: true
-      pattern: "EntityManager"
+      pattern: "EntityManager\\s+(\\w+)\\s*="
 
     - name: "Session Hibernate"
       function: "Session"
       description: "Hibernate查询，注意HQL/SQL注入风险"
       regex: true
-      pattern: "\\bSession\\b"
+      pattern: "Session\\s+(\\w+)\\s*="
 
     - name: "MongoDatabase NoSQL"
       function: "MongoDatabase"
       description: "MongoDB命令执行，注意NoSQL注入"
       regex: true
-      pattern: "MongoDatabase"
+      pattern: "MongoDatabase\\s+(\\w+)\\s*="
 
     - name: "MongoCollection NoSQL"
       function: "MongoCollection"
       description: "MongoDB查询，注意NoSQL注入"
       regex: true
-      pattern: "MongoCollection"
+      pattern: "MongoCollection(<[^>]+>)?\\s+(\\w+)\\s*="
 
     - name: "RedisTemplate Redis"
       function: "RedisTemplate"
       description: "Redis命令执行，注意命令注入"
       regex: true
-      pattern: "RedisTemplate"
+      pattern: "RedisTemplate(<[^>]+>)?\\s+(\\w+)\\s*="
 
     - name: "createSQLQuery SQL注入"
       function: ".createSQLQuery("
@@ -528,15 +528,15 @@ rules:
       regex: true
       pattern: "new\\s+File\\s*\\("
       
-    - name: "文件读取FileInputStream"
-      function: "FileInputStream"
-      description: "文件输入流，注意路径验证防止路径遍历"
+    - name: "new FileInputStream文件读取"
+      function: "new FileInputStream("
+      description: "实例化文件输入流，注意路径验证防止路径遍历"
       regex: true
       pattern: "new\\s+FileInputStream\\s*\\("
-      
-    - name: "文件写入FileOutputStream"
-      function: "FileOutputStream"
-      description: "文件输出流，注意路径验证"
+
+    - name: "new FileOutputStream文件写入"
+      function: "new FileOutputStream("
+      description: "实例化文件输出流，注意路径验证"
       regex: true
       pattern: "new\\s+FileOutputStream\\s*\\("
       
@@ -582,11 +582,29 @@ rules:
       regex: true
       pattern: "new\\s+URL\\s*\\("
 
-    - name: "HttpClients.create HTTP请求"
-      function: "HttpClients.create"
-      description: "创建HttpClient，注意SSRF风险"
+    - name: "HttpClients.createDefault HTTP请求"
+      function: "HttpClients.createDefault("
+      description: "创建默认HttpClient，注意SSRF风险"
       regex: true
-      pattern: "HttpClients\\.create"
+      pattern: "HttpClients\\.createDefault\\s*\\("
+
+    - name: "HttpClients.createSystem HTTP请求"
+      function: "HttpClients.createSystem("
+      description: "创建系统HttpClient，注意SSRF风险"
+      regex: true
+      pattern: "HttpClients\\.createSystem\\s*\\("
+
+    - name: "HttpClients.createMinimal HTTP请求"
+      function: "HttpClients.createMinimal("
+      description: "创建最小化HttpClient，注意SSRF风险"
+      regex: true
+      pattern: "HttpClients\\.createMinimal\\s*\\("
+
+    - name: "HttpClients.custom HTTP请求"
+      function: "HttpClients.custom("
+      description: "自定义HttpClient构建器，注意SSRF风险"
+      regex: true
+      pattern: "HttpClients\\.custom\\s*\\("
 
     - name: "openConnection连接"
       function: ".openConnection("
@@ -702,9 +720,9 @@ rules:
       regex: true
       pattern: "File.*\\.listFiles\\s*\\("
       
-    - name: "FileReader文件读取"
-      function: "FileReader"
-      description: "文件字符流读取，注意路径验证"
+    - name: "new FileReader文件读取"
+      function: "new FileReader("
+      description: "实例化文件字符流读取，注意路径验证"
       regex: true
       pattern: "new\\s+FileReader\\s*\\("
       
@@ -714,45 +732,45 @@ rules:
       regex: true
       pattern: "new\\s+Scanner\\s*\\("
       
-    - name: "FileWriter文件写入"
-      function: "FileWriter"
-      description: "文件字符流写入，注意路径验证"
+    - name: "new FileWriter文件写入"
+      function: "new FileWriter("
+      description: "实例化文件字符流写入，注意路径验证"
       regex: true
       pattern: "new\\s+FileWriter\\s*\\("
-      
-    - name: "BufferedReader文件读取"
-      function: "BufferedReader"
-      description: "缓冲字符流读取"
+
+    - name: "new BufferedReader文件读取"
+      function: "new BufferedReader("
+      description: "实例化缓冲字符流读取"
       regex: true
       pattern: "new\\s+BufferedReader\\s*\\("
-      
-    - name: "BufferedWriter文件写入"
-      function: "BufferedWriter"
-      description: "缓冲字符流写入"
+
+    - name: "new BufferedWriter文件写入"
+      function: "new BufferedWriter("
+      description: "实例化缓冲字符流写入"
       regex: true
       pattern: "new\\s+BufferedWriter\\s*\\("
-      
-    - name: "RandomAccessFile文件操作"
-      function: "RandomAccessFile"
-      description: "随机访问文件，注意路径验证"
+
+    - name: "new RandomAccessFile文件操作"
+      function: "new RandomAccessFile("
+      description: "实例化随机访问文件，注意路径验证"
       regex: true
       pattern: "new\\s+RandomAccessFile\\s*\\("
-      
-    - name: "ZipInputStream ZIP解压"
-      function: "ZipInputStream"
-      description: "ZIP输入流，注意Zip Slip漏洞"
+
+    - name: "new ZipInputStream ZIP解压"
+      function: "new ZipInputStream("
+      description: "实例化ZIP输入流，注意Zip Slip漏洞"
       regex: true
       pattern: "new\\s+ZipInputStream\\s*\\("
-      
-    - name: "ZipFile ZIP文件"
-      function: "ZipFile"
-      description: "ZIP文件操作，注意Zip Slip漏洞"
+
+    - name: "new ZipFile ZIP文件"
+      function: "new ZipFile("
+      description: "实例化ZIP文件操作，注意Zip Slip漏洞"
       regex: true
       pattern: "new\\s+ZipFile\\s*\\("
-      
-    - name: "TarArchiveInputStream TAR解压"
-      function: "TarArchiveInputStream"
-      description: "TAR输入流，注意路径遍历"
+
+    - name: "new TarArchiveInputStream TAR解压"
+      function: "new TarArchiveInputStream("
+      description: "实例化TAR输入流，注意路径遍历"
       regex: true
       pattern: "new\\s+TarArchiveInputStream\\s*\\("
       
@@ -832,13 +850,13 @@ rules:
       function: "RequestDispatcher"
       description: "包含资源，注意路径验证"
       regex: true
-      pattern: "RequestDispatcher"
+      pattern: "RequestDispatcher\\s+(\\w+)\\s*="
 
     - name: "URLConnection URL连接"
       function: "URLConnection"
       description: "URL连接，注意SSRF风险"
       regex: true
-      pattern: "URLConnection"
+      pattern: "URLConnection\\s+(\\w+)\\s*="
 
     - name: "include包含"
       function: ".include("
@@ -862,19 +880,19 @@ rules:
       function: "HttpURLConnection"
       description: "HTTP URL连接，注意SSRF风险"
       regex: true
-      pattern: "HttpURLConnection"
-      
-    - name: "OkHttpClient HTTP请求"
-      function: "OkHttpClient"
-      description: "OkHttp请求，注意SSRF风险"
-      regex: true
-      pattern: "OkHttpClient"
+      pattern: "HttpURLConnection\\s+(\\w+)\\s*="
 
-    - name: "RestTemplate HTTP请求"
-      function: "RestTemplate"
-      description: "RestTemplate请求，注意SSRF风险"
+    - name: "new OkHttpClient HTTP请求"
+      function: "new OkHttpClient("
+      description: "实例化OkHttp客户端，注意SSRF风险"
       regex: true
-      pattern: "RestTemplate"
+      pattern: "new\\s+OkHttpClient\\s*\\("
+
+    - name: "new RestTemplate HTTP请求"
+      function: "new RestTemplate("
+      description: "实例化RestTemplate，注意SSRF风险"
+      regex: true
+      pattern: "new\\s+RestTemplate\\s*\\("
 
     - name: "newCall HTTP请求"
       function: ".newCall("
@@ -958,7 +976,7 @@ rules:
       function: "JavaMailSender"
       description: "发送邮件，注意邮件头注入"
       regex: true
-      pattern: "JavaMailSender"
+      pattern: "JavaMailSender\\s+(\\w+)\\s*="
 
     - name: "new MimeMessage邮件消息"
       function: "new MimeMessage("
@@ -1085,13 +1103,13 @@ rules:
       function: "Runtime"
       description: "Runtime运行时类，可能泄露系统信息"
       regex: true
-      pattern: "\\bRuntime\\b"
+      pattern: "Runtime\\s+(\\w+)\\s*="
 
     - name: "InetAddress网络地址"
       function: "InetAddress"
       description: "InetAddress网络地址类，可能泄露主机信息"
       regex: true
-      pattern: "InetAddress"
+      pattern: "InetAddress\\s+(\\w+)\\s*="
 
     - name: "availableProcessors处理器数"
       function: ".availableProcessors("
@@ -1151,19 +1169,19 @@ rules:
       function: "Thread"
       description: "Thread线程类"
       regex: true
-      pattern: "\\bThread\\b"
+      pattern: "Thread\\s+(\\w+)\\s*="
 
     - name: "Exception异常"
       function: "Exception"
       description: "Exception异常类，可能泄露敏感信息"
       regex: true
-      pattern: "\\bException\\b"
+      pattern: "Exception\\s+(\\w+)\\s*="
 
     - name: "Throwable异常"
       function: "Throwable"
       description: "Throwable异常类，可能泄露路径信息"
       regex: true
-      pattern: "\\bThrowable\\b"
+      pattern: "Throwable\\s+(\\w+)\\s*="
 
     - name: "getClassLoader类加载器"
       function: ".getClassLoader("
@@ -1199,13 +1217,13 @@ rules:
       function: "Field"
       description: "Field反射字段类"
       regex: true
-      pattern: "\\bField\\b"
+      pattern: "Field\\s+(\\w+)\\s*="
 
     - name: "AccessibleObject反射访问"
       function: "AccessibleObject"
       description: "AccessibleObject反射访问类，绕过访问控制"
       regex: true
-      pattern: "AccessibleObject"
+      pattern: "AccessibleObject\\s+(\\w+)\\s*="
 
     - name: "getDeclaredFields反射字段"
       function: ".getDeclaredFields("
@@ -1265,7 +1283,7 @@ rules:
       function: "Path"
       description: "Path路径类"
       regex: true
-      pattern: "\\bPath\\b"
+      pattern: "Path\\s+(\\w+)\\s*="
 
     - name: "exists文件检查"
       function: ".exists("

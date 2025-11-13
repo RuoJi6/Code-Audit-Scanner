@@ -559,7 +559,7 @@ rules:
       function: "HttpWebRequest"
       description: "HTTP请求，注意SSRF风险"
       regex: true
-      pattern: "HttpWebRequest"
+      pattern: "HttpWebRequest\\s+(\\w+)"
       
     - name: "HTTP请求WebClient"
       function: "WebClient"
@@ -817,7 +817,7 @@ rules:
       function: "FtpWebRequest"
       description: "FTP请求，可能存在SSRF风险"
       regex: true
-      pattern: "FtpWebRequest"
+      pattern: "FtpWebRequest\\s+(\\w+)"
       
     - name: "DES加密"
       function: "DES.Create("

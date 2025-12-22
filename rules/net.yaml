@@ -290,6 +290,18 @@ rules:
       regex: true
       pattern: "XmlSerializer.*\\.Deserialize\\s*\\("
       
+    - name: "DataSet.ReadXml XXE"
+      function: "DataSet.ReadXml("
+      description: "DataSet读取XML，可能存在XXE漏洞"
+      regex: true
+      pattern: "DataSet.*\\.ReadXml\\s*\\("
+      
+    - name: "DataTable.ReadXml XXE"
+      function: "DataTable.ReadXml("
+      description: "DataTable读取XML，可能存在XXE漏洞"
+      regex: true
+      pattern: "DataTable.*\\.ReadXml\\s*\\("
+      
     - name: "SQL命令执行"
       function: "SqlCommand"
       description: "SQL命令执行，注意SQL注入风险"
@@ -313,6 +325,36 @@ rules:
       description: "执行SQL查询返回单值，注意SQL注入风险"
       regex: true
       pattern: "ExecuteScalar\\s*\\("
+      
+    - name: "SqlDataAdapter.Fill SQL注入"
+      function: "SqlDataAdapter.Fill("
+      description: "填充DataSet/DataTable，注意SQL注入风险"
+      regex: true
+      pattern: "SqlDataAdapter.*\\.Fill\\s*\\("
+      
+    - name: "ExecuteSqlCommand SQL注入"
+      function: "ExecuteSqlCommand("
+      description: "Entity Framework执行原始SQL命令，注意SQL注入风险"
+      regex: true
+      pattern: "ExecuteSqlCommand\\s*\\("
+      
+    - name: "ExecuteSqlRaw SQL注入"
+      function: "ExecuteSqlRaw("
+      description: "EF Core执行原始SQL，注意SQL注入风险"
+      regex: true
+      pattern: "ExecuteSqlRaw\\s*\\("
+      
+    - name: "CreateSQLQuery SQL注入"
+      function: "CreateSQLQuery("
+      description: "NHibernate创建SQL查询，注意SQL注入风险"
+      regex: true
+      pattern: "CreateSQLQuery\\s*\\("
+      
+    - name: "Dapper.Query SQL注入"
+      function: "connection.Query("
+      description: "Dapper查询，注意SQL注入风险"
+      regex: true
+      pattern: "\\.Query\\s*<|connection\\.Query\\s*\\("
       
     - name: "XPath查询"
       function: "XPathNavigator.Compile("
@@ -488,6 +530,36 @@ rules:
       regex: true
       pattern: "WebRequest\\.Create\\s*\\("
       
+    - name: "HttpClient.PostAsync SSRF"
+      function: "HttpClient.PostAsync("
+      description: "HTTP POST请求，可能存在SSRF风险"
+      regex: true
+      pattern: "HttpClient.*\\.PostAsync\\s*\\("
+      
+    - name: "HttpClient.GetStreamAsync SSRF/远程文件下载"
+      function: "HttpClient.GetStreamAsync("
+      description: "获取HTTP响应流，可能存在SSRF或远程文件下载风险"
+      regex: true
+      pattern: "HttpClient.*\\.GetStreamAsync\\s*\\("
+      
+    - name: "HttpClient.GetByteArrayAsync SSRF/远程文件下载"
+      function: "HttpClient.GetByteArrayAsync("
+      description: "获取HTTP响应字节数组，可能存在SSRF或远程文件下载风险"
+      regex: true
+      pattern: "HttpClient.*\\.GetByteArrayAsync\\s*\\("
+      
+    - name: "WebClient.DownloadFile 远程文件下载"
+      function: "WebClient.DownloadFile("
+      description: "下载远程文件到本地，可能存在SSRF和任意文件写入风险"
+      regex: true
+      pattern: "WebClient.*\\.DownloadFile\\s*\\("
+      
+    - name: "WebClient.DownloadData 远程文件下载"
+      function: "WebClient.DownloadData("
+      description: "下载远程文件数据，可能存在SSRF风险"
+      regex: true
+      pattern: "WebClient.*\\.DownloadData\\s*\\("
+      
     - name: "RestClient SSRF"
       function: "RestClient"
       description: "REST客户端，可能存在SSRF风险"
@@ -512,6 +584,24 @@ rules:
       description: "读取文件字节，注意路径验证"
       regex: true
       pattern: "File\\.ReadAllBytes\\s*\\("
+      
+    - name: "Response.WriteFile 任意文件读取"
+      function: "Response.WriteFile("
+      description: "将文件内容写入HTTP响应，可能导致任意文件读取"
+      regex: true
+      pattern: "Response\\.WriteFile\\s*\\("
+      
+    - name: "Response.TransmitFile 任意文件读取"
+      function: "Response.TransmitFile("
+      description: "传输文件到HTTP响应，可能导致任意文件读取"
+      regex: true
+      pattern: "Response\\.TransmitFile\\s*\\("
+      
+    - name: "File() MVC文件下载"
+      function: "File("
+      description: "MVC返回文件结果，可能导致任意文件读取"
+      regex: true
+      pattern: "\\breturn\\s+File\\s*\\(|\\bFile\\s*\\([^)]*FileStream"
       
     - name: "文件写入File.WriteAllText"
       function: "File.WriteAllText("

@@ -155,6 +155,54 @@ rules:
       regex: true
       pattern: "new\\s+XStream\\s*\\("
 
+    - name: "XStream.allowTypes类型白名单"
+      function: "allowTypes("
+      description: "XStream允许类型配置，需审查白名单是否安全"
+      regex: true
+      pattern: "\\.allowTypes\\s*\\("
+
+    - name: "XStream.allowTypesByWildcard通配符白名单"
+      function: "allowTypesByWildcard("
+      description: "XStream通配符类型白名单，可能配置过于宽松"
+      regex: true
+      pattern: "\\.allowTypesByWildcard\\s*\\("
+
+    - name: "XStream.allowTypesByRegExp正则白名单"
+      function: "allowTypesByRegExp("
+      description: "XStream正则类型白名单，需审查正则是否安全"
+      regex: true
+      pattern: "\\.allowTypesByRegExp\\s*\\("
+
+    - name: "XStream.addPermission权限配置"
+      function: "addPermission("
+      description: "XStream权限配置，需审查权限设置是否安全"
+      regex: true
+      pattern: "\\.addPermission\\s*\\("
+
+    - name: "XStream.denyTypes类型黑名单"
+      function: "denyTypes("
+      description: "XStream类型黑名单配置，黑名单方式可能被绕过"
+      regex: true
+      pattern: "\\.denyTypes\\s*\\("
+
+    - name: "XStream.setupDefaultSecurity默认安全配置"
+      function: "setupDefaultSecurity("
+      description: "XStream默认安全配置，1.4.10+版本推荐使用"
+      regex: true
+      pattern: "\\.setupDefaultSecurity\\s*\\("
+
+    - name: "XStream.setMode模式设置"
+      function: "setMode("
+      description: "XStream模式设置，某些模式可能不安全"
+      regex: true
+      pattern: "\\.setMode\\s*\\("
+
+    - name: "XStream.processAnnotations注解处理"
+      function: "processAnnotations("
+      description: "XStream注解处理，可能导致任意类实例化"
+      regex: true
+      pattern: "\\.processAnnotations\\s*\\("
+
     - name: "new Yaml反序列化"
       function: "new Yaml("
       description: "实例化Yaml，可能存在反序列化漏洞"
@@ -184,6 +232,108 @@ rules:
       description: "创建Statement对象，注意SQL注入风险"
       regex: true
       pattern: "createStatement\\s*\\("
+
+    - name: "DriverManager.getConnection JDBC连接"
+      function: "DriverManager.getConnection("
+      description: "JDBC数据库连接，若URL可控可能存在JDBC反序列化漏洞"
+      regex: true
+      pattern: "DriverManager\\.getConnection\\s*\\("
+
+    - name: "MySQL JDBC autoDeserialize反序列化"
+      function: "autoDeserialize=true"
+      description: "MySQL JDBC autoDeserialize参数开启，可导致反序列化RCE漏洞"
+      regex: true
+      pattern: "autoDeserialize\\s*=\\s*true"
+
+    - name: "MySQL JDBC detectCustomCollations反序列化"
+      function: "detectCustomCollations=true"
+      description: "MySQL JDBC detectCustomCollations参数，配合autoDeserialize可触发反序列化"
+      regex: true
+      pattern: "detectCustomCollations\\s*=\\s*true"
+
+    - name: "MySQL JDBC allowLoadLocalInfile文件读取"
+      function: "allowLoadLocalInfile=true"
+      description: "MySQL JDBC allowLoadLocalInfile参数开启，可导致任意文件读取"
+      regex: true
+      pattern: "allowLoadLocalInfile\\s*=\\s*true"
+
+    - name: "MySQL JDBC allowUrlInLocalInfile文件读取"
+      function: "allowUrlInLocalInfile=true"
+      description: "MySQL JDBC allowUrlInLocalInfile参数开启，可导致SSRF或文件读取"
+      regex: true
+      pattern: "allowUrlInLocalInfile\\s*=\\s*true"
+
+    - name: "MySQL JDBC allowLoadLocalInfileInPath文件读取"
+      function: "allowLoadLocalInfileInPath"
+      description: "MySQL JDBC allowLoadLocalInfileInPath参数，限制本地文件读取路径"
+      regex: true
+      pattern: "allowLoadLocalInfileInPath\\s*="
+
+    - name: "PostgreSQL JDBC socketFactory代码执行"
+      function: "socketFactory="
+      description: "PostgreSQL JDBC socketFactory参数，可导致任意代码执行"
+      regex: true
+      pattern: "socketFactory\\s*=\\s*[^&]+"
+
+    - name: "PostgreSQL JDBC socketFactoryArg参数注入"
+      function: "socketFactoryArg="
+      description: "PostgreSQL JDBC socketFactoryArg参数，配合socketFactory可执行任意代码"
+      regex: true
+      pattern: "socketFactoryArg\\s*="
+
+    - name: "PostgreSQL JDBC sslfactory代码执行"
+      function: "sslfactory="
+      description: "PostgreSQL JDBC sslfactory参数，可导致任意代码执行"
+      regex: true
+      pattern: "sslfactory\\s*=\\s*[^&]+"
+
+    - name: "PostgreSQL JDBC sslfactoryarg参数注入"
+      function: "sslfactoryarg="
+      description: "PostgreSQL JDBC sslfactoryarg参数，配合sslfactory可执行任意代码"
+      regex: true
+      pattern: "sslfactoryarg\\s*="
+
+    - name: "PostgreSQL JDBC loggerLevel日志注入"
+      function: "loggerLevel="
+      description: "PostgreSQL JDBC loggerLevel参数，可能导致日志注入"
+      regex: true
+      pattern: "loggerLevel\\s*="
+
+    - name: "PostgreSQL JDBC loggerFile文件写入"
+      function: "loggerFile="
+      description: "PostgreSQL JDBC loggerFile参数，可导致任意文件写入"
+      regex: true
+      pattern: "loggerFile\\s*="
+
+    - name: "H2 Database INIT代码执行"
+      function: "INIT=RUNSCRIPT"
+      description: "H2 Database INIT参数，可执行任意SQL脚本导致RCE"
+      regex: true
+      pattern: "INIT\\s*=\\s*RUNSCRIPT"
+
+    - name: "H2 Database TRACE_LEVEL_FILE文件写入"
+      function: "TRACE_LEVEL_FILE"
+      description: "H2 Database TRACE_LEVEL_FILE参数，可导致任意文件写入"
+      regex: true
+      pattern: "TRACE_LEVEL_FILE\\s*="
+
+    - name: "H2 Database MODE模式设置"
+      function: "MODE="
+      description: "H2 Database MODE参数，某些模式可能存在安全风险"
+      regex: true
+      pattern: "MODE\\s*=\\s*[^;]+"
+
+    - name: "Derby JDBC代码执行"
+      function: "derby:classpath:"
+      description: "Derby JDBC classpath协议，可加载恶意类"
+      regex: true
+      pattern: "derby:classpath:"
+
+    - name: "IBM DB2 JDBC clientRerouteServerListJNDIName"
+      function: "clientRerouteServerListJNDIName="
+      description: "IBM DB2 JDBC JNDI注入参数，可导致JNDI注入攻击"
+      regex: true
+      pattern: "clientRerouteServerListJNDIName\\s*="
       
     - name: "动态SQL查询"
       function: "createQuery("
